@@ -4,11 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fortnite Discovery 🗺️</title>  <style>
+    <title>Fortnite Discovery 🗺️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <style>
+        /* Ensure you have the Burbank Big Condensed font file and the path is correct */
         @font-face {
             font-family: 'Burbank Big Condensed';
             src: url('path/to/BurbankBigCondensed-Black.ttf') format('truetype');
-            /* Replace with the actual path */
+            /* Replace with the actual path to your font file */
             font-weight: 900;
             font-style: normal;
         }
@@ -18,82 +22,108 @@
             margin: 0;
             background-color: #0c0f14;
             color: #e0e0e0;
-            padding: 20px;
+            padding: 10px;
+            position: relative;
+            overflow-x: hidden;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
             display: flex;
+            flex-direction: column;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
         }
+        .container.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
 
         /* Header Styles (Moved to Sidebar) */
         .sidebar-header {
             color: #fff;
             font-family: 'Burbank Big Condensed', sans-serif;
-            font-size: 2em;
-            margin-bottom: 20px;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
 
         .search-bar {
             background-color: #16181d;
             border: none;
-            padding: 8px 15px;
+            padding: 10px 15px;
             border-radius: 5px;
             color: #bdc3c7;
-            width: 80%;
-            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            transition: box-shadow 0.3s ease;
         }
+         .search-bar:focus {
+            outline: none;
+            box-shadow: 0 0 8px rgba(0, 188, 212, 0.5);
+         }
+
 
         /* Sidebar Styles */
         .sidebar {
-            width: 200px;
-            margin-right: 20px;
-            padding-top: 20px;
+            width: 100%;
+            margin-right: 0;
+            padding-top: 10px;
+            margin-bottom: 20px;
         }
 
         .category-list {
             list-style: none;
             padding: 0;
             margin: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
         }
 
         .category-item {
             background-color: #16181d;
-            padding: 8px 15px;
+            padding: 8px 12px;
             border-radius: 5px;
             color: #bdc3c7;
             cursor: pointer;
-            transition: background-color 0.3s ease;
-            margin-bottom: 5px;
-            position: relative; /* For the emoji animation */
-            overflow: hidden; /* Clip the bounce */
+            transition: background-color 0.3s ease, transform 0.1s ease-in-out;
+            margin-bottom: 0;
+            text-align: center;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            user-select: none;
         }
 
         .category-item:hover {
             background-color: #222;
+            transform: translateY(-2px);
         }
+         .category-item:active {
+             transform: translateY(0);
+         }
+
 
         /* Main Content Styles */
         #discovery-content {
             flex: 1;
+            width: 100%;
         }
 
         .category-title {
             color: #fff;
             font-family: 'Burbank Big Condensed', sans-serif;
-            font-size: 1.5em;
+            font-size: 1.4em;
             margin-bottom: 15px;
             text-transform: uppercase;
-        }
-
-        .discovery-row {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-            max-width: calc(5 * (160px + 15px));
+            border-bottom: 2px solid #16181d;
+            padding-bottom: 5px;
         }
 
         .island-card {
@@ -101,17 +131,25 @@
             border-radius: 5px;
             overflow: hidden;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-            width: 160px;
+            width: 100%;
             flex-shrink: 0;
-            transition: transform 0.2s ease-in-out, opacity 0.3s ease-in-out;
+            transition: transform 0.2s ease-in-out, opacity 0.3s ease-in-out, box-shadow 0.2s ease-in-out;
             display: flex;
             flex-direction: column;
             opacity: 1;
+            cursor: pointer;
+            user-select: none;
         }
 
         .island-card:hover {
-            transform: scale(1.05);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
         }
+         .island-card:active {
+             transform: translateY(-2px);
+             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+         }
+
 
         .card-header {
             position: relative;
@@ -149,7 +187,7 @@
         .player-count {
             position: absolute;
             top: 5px;
-            right: 5px;
+right: 5px;
             background-color: rgba(0, 0, 0, 0.7);
             color: #fff;
             padding: 2px 5px;
@@ -159,26 +197,51 @@
             z-index: 1;
             transition: opacity 0.3s ease-in-out;
             opacity: 1;
-            display: flex;         /* Flexbox */
-            align-items: center;    /* Vertical center */
-            justify-content: center; /* Horizontal center */
-            gap: 2px;               /* Space between text/emoji */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
         }
 
         .card-body {
             padding: 8px;
             text-align: center;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .island-title {
             font-weight: bold;
-            font-size: 0.8em;
+            font-size: 0.85em;
             color: #f0f0f0;
-            margin-bottom: 0;
+            margin: 0 0 4px 0;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
         }
+
+        .creator-name,
+        .island-code {
+            font-size: 0.7em;
+            color: #bdc3c7;
+            margin: 0 0 2px 0;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .island-code {
+             font-weight: bold;
+             margin-bottom: 0;
+             cursor: copy;
+             transition: color 0.2s ease;
+        }
+         .island-code:hover {
+            color: #fff;
+         }
+
 
         #loading {
             text-align: center;
@@ -200,48 +263,46 @@
 
         .map-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
             gap: 15px;
         }
 
         .hidden {
-            opacity: 0;
             display: none;
-            transition: opacity 0.3s ease-in-out;
         }
 
         #timer {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: rgba(0, 0, 0, 0.7);
+            bottom: 15px;
+            right: 15px;
+            background-color: rgba(0, 0, 0, 0.8);
             color: #fff;
-            padding: 10px;
+            padding: 8px 12px;
             border-radius: 5px;
-            font-size: 0.9em;
+            font-size: 0.8em;
             z-index: 1000;
-            display: flex;       /* Flexbox for centering */
-            align-items: center;  /* Vertical centering */
-            justify-content: center; /* Horizontal centering */
-            gap: 5px;             /* Space between text and emoji */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
         }
 
         #back-to-top {
             position: fixed;
-            bottom: 80px;  /* Adjusted to make space for timer */
-            right: 20px;
-            background-color: rgba(0, 0, 0, 0.7);
+            bottom: 65px;
+            right: 15px;
+            background-color: rgba(0, 0, 0, 0.8);
             color: #fff;
-            padding: 10px;
+            padding: 8px 12px;
             border-radius: 5px;
-            font-size: 1.5em;
+            font-size: 1.2em;
             cursor: pointer;
             opacity: 0;
             transition: opacity 0.3s ease;
             z-index: 1000;
-            display: flex;       /* Flexbox for centering */
-            align-items: center;  /* Vertical centering */
-            justify-content: center; /* Horizontal centering */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         #back-to-top.show {
@@ -250,12 +311,12 @@
 
         #initial-loading {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 50px;
             font-style: italic;
             color: #757575;
-            font-size: 2em; /* Bigger! */
+            font-size: 2em;
             opacity: 0;
-            transform: scale(0.8); /* Start smaller */
+            transform: scale(0.8);
             animation: initialLoadAnimation 1s ease-out forwards;
         }
 
@@ -265,41 +326,845 @@
                 transform: scale(1);
             }
         }
+
+        /* --- Custom Alert Styles --- */
+        #custom-alert {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #2ecc71;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 5px;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+            font-size: 0.9em;
+            text-align: center;
+        }
+
+        #custom-alert.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* --- Modal Styles --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: #16181d;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 95%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            position: relative;
+            color: #e0e0e0;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease-in-out;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+         .modal-overlay.show .modal-content {
+            transform: translateY(0);
+         }
+
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5em;
+            color: #bdc3c7;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+         .modal-close:hover {
+             color: #fff;
+         }
+
+        .modal-title {
+             font-family: 'Burbank Big Condensed', sans-serif;
+             font-size: 1.5em;
+             margin-bottom: 10px;
+             color: #fff;
+             text-align: center;
+        }
+
+        .modal-body {
+            margin-top: 15px;
+        }
+
+        .modal-loading, .modal-error {
+            text-align: center;
+            font-style: italic;
+            margin-top: 15px;
+        }
+         .modal-error {
+             color: #e74c3c;
+         }
+
+        /* --- Modal Stats Styling --- */
+        #modal-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+             margin-bottom: 20px;
+        }
+
+        .stat-line {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #222;
+            font-size: 0.9em;
+        }
+         .stat-line:last-child {
+             border-bottom: none;
+         }
+
+        .stat-label {
+            font-weight: bold;
+            color: #bdc3c7;
+            flex-shrink: 0;
+             padding-right: 10px;
+        }
+
+        .stat-value {
+            color: #f0f0f0;
+             font-weight: normal;
+             text-align: right;
+             word-break: break-word;
+        }
+
+        /* --- Chart Section Styling --- */
+        .chart-section {
+             margin-top: 20px;
+             border-top: 1px solid #222;
+             padding-top: 20px;
+        }
+
+        .chart-title {
+             font-size: 1.2em;
+             font-weight: bold;
+             margin-bottom: 10px;
+             text-align: center;
+             color: #bdc3c7;
+        }
+
+        .chart-controls {
+             display: flex;
+             justify-content: center;
+             gap: 10px;
+             margin-bottom: 15px;
+             flex-wrap: wrap;
+        }
+
+        .chart-controls button {
+             padding: 5px 10px;
+             background-color: #1e2228;
+             color: #bdc3c7;
+             border: 1px solid #222;
+             border-radius: 4px;
+             cursor: pointer;
+             font-size: 0.8em;
+             transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+         .chart-controls button:hover {
+             background-color: #2a3038;
+             border-color: #333;
+         }
+        .chart-controls button.active {
+             background-color: #007bff;
+             border-color: #007bff;
+             color: white;
+             font-weight: bold;
+        }
+
+
+        #chart-container {
+             position: relative;
+             height: 200px;
+             width: 100%;
+        }
+
+        #chart-container canvas {
+             max-width: 100%;
+             max-height: 100%;
+        }
+
+         #chart-loading {
+            text-align: center;
+            font-style: italic;
+            margin-top: 15px;
+            color: #757575;
+         }
+
+        /* --- Discovery Placement Section Styling --- */
+        .placement-section {
+             margin-top: 20px;
+             border-top: 1px solid #222;
+             padding-top: 20px;
+        }
+
+        .placement-title {
+             font-family: 'Burbank Big Condensed', sans-serif;
+             font-size: 1.3em; /* Slightly larger title */
+             margin-bottom: 15px;
+             text-align: center;
+             color: #fff; /* White color */
+        }
+
+        .placement-list {
+             list-style: none;
+             padding: 0;
+             margin: 0;
+             display: flex; /* Use flex for layout */
+             flex-direction: column;
+             gap: 8px; /* Space between list items */
+        }
+
+        .placement-item {
+             background-color: #1e2228; /* Slightly lighter background */
+             padding: 10px 15px;
+             border-radius: 5px;
+             display: flex; /* Flex for panel name and rank */
+             justify-content: space-between;
+             align-items: center;
+             font-size: 0.9em;
+        }
+
+        .placement-panel-name {
+             font-weight: bold;
+             color: #bdc3c7;
+        }
+
+        .placement-rank {
+             font-weight: bold;
+             color: #007bff; /* Highlight rank */
+             font-size: 1.1em; /* Slightly larger rank */
+        }
+
+
+        #modal-copy-code {
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4栋px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.2s ease;
+        }
+         #modal-copy-code:hover {
+             background-color: #0056b3;
+         }
+         #modal-copy-code:active {
+             background-color: #004085;
+         }
+
+
+        /* --- Desktop Styles (apply when screen is wider than 768px) --- */
+        @media (min-width: 768px) {
+            body {
+                padding: 20px;
+            }
+
+            .container {
+                flex-direction: row;
+            }
+
+            .sidebar-header {
+                font-size: 2em;
+                margin-bottom: 20px;
+                text-align: left;
+            }
+
+            .search-bar {
+                width: 80%;
+                margin-bottom: 20px;
+            }
+
+            .sidebar {
+                width: 200px;
+                margin-right: 20px;
+                padding-top: 20px;
+                flex-shrink: 0;
+                margin-bottom: 0;
+            }
+
+            .category-list {
+                display: block;
+            }
+
+            .category-item {
+                 margin-bottom: 5px;
+                 text-align: left;
+                 padding: 8px 15px;
+                 grid-template-columns: none;
+                 gap: 0;
+            }
+
+            #discovery-content {
+                width: auto;
+            }
+
+            .category-title {
+                font-size: 1.5em;
+                margin-bottom: 15px;
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+
+             .map-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 15px;
+            }
+
+            #timer {
+                bottom: 20px;
+                right: 20px;
+                padding: 10px;
+                font-size: 0.9em;
+            }
+
+            #back-to-top {
+                bottom: 80px;
+                right: 20px;
+                padding: 10px;
+                font-size: 1.5em;
+            }
+
+            #custom-alert {
+                 bottom: 30px;
+            }
+             .modal-content {
+                width: 500px;
+             }
+
+            #chart-container {
+                 height: 250px;
+            }
+
+        }
     </style>
 </head>
 
 <body>
-    <div id="initial-loading">Loading data... ⏳</div>  <div class="container" style="display: none;">
+    <div id="initial-loading">Loading data... ⏳</div>
+    <div class="container" style="display: none;">
         <aside class="sidebar">
-            <h1 class="sidebar-header">Fortnite Discovery 🗺️</h1> <input type="text" class="search-bar" id="search-input" placeholder="Search 🔍..."> <ul class="category-list" id="category-list">
-                </ul>
+            <h1 class="sidebar-header">Fortnite Discovery 🗺️</h1>
+            <input type="text" class="search-bar" id="search-input" placeholder="Search 🔍...">
+            <ul class="category-list" id="category-list">
+            </ul>
         </aside>
         <div id="discovery-content">
-            <p id="loading">Loading data... ⏳</p>  </div>
+            <p id="loading">Loading data... ⏳</p>
+        </div>
     </div>
-    <div id="back-to-top">⬆️</div>  <div id="timer">Next update in: <span id="countdown"></span> ⏱️</div> <script>
+    <div id="back-to-top">⬆️</div>
+    <div id="timer">Next update in: <span id="countdown"></span> ⏱️</div>
+
+    <div id="custom-alert">Island code copied!</div>
+
+    <div class="modal-overlay" id="island-modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h2 class="modal-title" id="modal-island-title"></h2>
+            <div class="modal-body">
+                <p id="modal-loading" class="modal-loading">Loading details... 📈</p>
+                <p id="modal-error" class="modal-error" style="display: none;"></p>
+
+                <div id="modal-stats">
+                    </div>
+
+                <div class="placement-section">
+                    <h3 class="placement-title">Discovery Placement</h3>
+                     <p id="placement-loading" class="modal-loading" style="display: none;">Loading placements...</p>
+                     <p id="placement-error" class="modal-error" style="display: none;"></p>
+                    <ul class="placement-list" id="modal-placement-list">
+                        </ul>
+                     <p id="no-placement" style="text-align: center; font-style: italic; color: #bdc3c7; display: none;">Not currently featured in Discovery panels.</p>
+                </div>
+
+                <div class="chart-section">
+                    <h3 class="chart-title">Detailed Player Count History</h3>
+                    <div class="chart-controls">
+                        <button data-range="D" class="active">Day</button>
+                        <button data-range="W">Week</button>
+                        <button data-range="M">Month</button>
+                        <button data-range="3M">3 Months</button>
+                        <button data-range="6M">6 Months</button>
+                        <button data-range="ALL">All Time</button>
+                    </div>
+                     <p id="chart-loading" style="display: none;">Loading chart data...</p>
+                    <div id="chart-container">
+                        <canvas id="player-count-chart"></canvas>
+                    </div>
+                </div>
+
+
+                <button id="modal-copy-code">Copy Island Code</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
         const initialLoading = document.getElementById('initial-loading');
         const container = document.querySelector('.container');
         const discoveryContent = document.getElementById('discovery-content');
         const categoryList = document.getElementById('category-list');
         const searchInput = document.getElementById('search-input');
         const countdownElement = document.getElementById('countdown');
-        const updateInterval = 60000; // Update every 60 seconds (was 60000)
+        const customAlert = document.getElementById('custom-alert');
+        const islandModal = document.getElementById('island-modal');
+        const modalContent = islandModal.querySelector('.modal-content');
+        const modalClose = islandModal.querySelector('.modal-close');
+        const modalTitle = islandModal.querySelector('#modal-island-title');
+        const modalBody = islandModal.querySelector('.modal-body');
+        const modalLoading = islandModal.querySelector('#modal-loading');
+        const modalError = islandModal.querySelector('#modal-error');
+        const modalStats = islandModal.querySelector('#modal-stats');
+        const modalCopyButton = islandModal.querySelector('#modal-copy-code');
+
+        const placementSection = islandModal.querySelector('.placement-section'); // Placement section
+        const placementTitle = islandModal.querySelector('.placement-title'); // Placement title
+        const placementLoading = islandModal.querySelector('#placement-loading'); // Placement loading
+        const placementError = islandModal.querySelector('#placement-error'); // Placement error
+        const modalPlacementList = islandModal.querySelector('#modal-placement-list'); // Placement list container
+        const noPlacementMessage = islandModal.querySelector('#no-placement'); // No placement message
+
+
+        const chartSection = islandModal.querySelector('.chart-section');
+        const chartTitle = islandModal.querySelector('.chart-title');
+        const chartControls = islandModal.querySelector('.chart-controls');
+        const chartContainer = islandModal.querySelector('#chart-container');
+        const chartCanvas = islandModal.querySelector('#player-count-chart');
+        const chartLoading = islandModal.querySelector('#chart-loading');
+
+
+        const updateInterval = 60000;
         let nextUpdateTime;
-        const backToTopButton = document.getElementById('back-to-top'); // Get the arrow
+        const backToTopButton = document.getElementById('back-to-top');
 
         let allCategories = [];
+        let alertTimeout;
+        let activeIslandCode = null;
+        let playerChart = null;
+        let rawChartData = null;
+
 
         function formatPlayerCount(count) {
-            if (count >= 1000) {
-                return (count / 1000).toFixed(1) + "K Players 🧑‍🤝‍🧑";  // Players emoji
+            if (count == null || count === 'N/A') return 'N/A';
+            const numCount = typeof count === 'string' ? parseInt(count, 10) : count;
+            if (isNaN(numCount)) return 'N/A';
+
+
+            if (numCount >= 1000) {
+                return (numCount / 1000).toFixed(1) + "K";
             }
-            return count + " Players 🧑‍🤝‍🧑";  // Players emoji
+            return numCount.toString();
         }
+
+         function formatDateTime(isoString, includeTime = true) {
+            if (!isoString) return 'N/A';
+            try {
+                const date = new Date(isoString);
+                 if (isNaN(date.getTime())) return 'Invalid Date';
+
+                 const year = date.getFullYear();
+                 const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                 const day = date.getDate().toString().padStart(2, '0');
+
+                 if (!includeTime) {
+                     return `${year}-${month}-${day}`;
+                 }
+
+                 const hours = date.getHours().toString().padStart(2, '0');
+                 const minutes = date.getMinutes().toString().padStart(2, '0');
+                return `${year}-${month}-${day} ${hours}:${minutes}`;
+            } catch (e) {
+                console.error("Error formatting date:", isoString, e);
+                return 'Invalid Date';
+            }
+        }
+
+         // Helper to create a stat line element
+        function createStatLine(label, value, emoji = '') {
+            const statLine = document.createElement('div');
+            statLine.classList.add('stat-line');
+
+            const labelSpan = document.createElement('span');
+            labelSpan.classList.add('stat-label');
+            labelSpan.textContent = label + ':';
+
+            const valueSpan = document.createElement('span');
+            valueSpan.classList.add('stat-value');
+             valueSpan.textContent = value + (emoji ? ` ${emoji}` : '');
+
+
+            statLine.appendChild(labelSpan);
+            statLine.appendChild(valueSpan);
+
+            return statLine;
+        }
+
+
+        function showCustomAlert(message, duration = 3000) {
+            if (alertTimeout) {
+                clearTimeout(alertTimeout);
+            }
+
+            customAlert.textContent = message;
+            customAlert.classList.add('show');
+
+            alertTimeout = setTimeout(() => {
+                customAlert.classList.remove('show');
+            }, duration);
+        }
+
+         // Function to filter chart data based on selected range
+         function filterChartData(range, data) {
+             if (!data || !Array.isArray(data)) return { labels: [], values: [] };
+
+             const filtered = data.filter(point => point.chartTag && point.chartTag.includes(range));
+
+             // Sort data points by date
+             filtered.sort((a, b) => new Date(a.at) - new Date(b.at));
+
+             // Format dates/times based on the range (e.g., show only date for longer ranges)
+             const includeTime = ['D', 'W'].includes(range); // Show time for Day and Week
+             const labels = filtered.map(point => formatDateTime(point.at, includeTime));
+             const values = filtered.map(point => point.ccu);
+
+             return { labels, values };
+         }
+
+         // Function to update or create the chart
+         function renderChart(chartData) {
+             if (playerChart) {
+                 // Update existing chart
+                 playerChart.data.labels = chartData.labels;
+                 playerChart.data.datasets[0].data = chartData.values;
+                 playerChart.update();
+             } else {
+                 // Create new chart
+                 const ctx = chartCanvas.getContext('2d');
+                 playerChart = new Chart(ctx, {
+                     type: 'line',
+                     data: {
+                         labels: chartData.labels,
+                         datasets: [{
+                             label: 'Players',
+                             data: chartData.values,
+                             borderColor: 'rgb(0, 123, 255)',
+                             tension: 0.3,
+                             pointRadius: 0,
+                             fill: true,
+                             backgroundColor: 'rgba(0, 123, 255, 0.2)'
+                         }]
+                     },
+                     options: {
+                         responsive: true,
+                         maintainAspectRatio: false,
+                         scales: {
+                             x: {
+                                 type: 'category',
+                                 labels: chartData.labels,
+                                 title: {
+                                     display: true,
+                                     text: 'Time',
+                                     color: '#bdc3c7'
+                                 },
+                                 ticks: {
+                                     color: '#bdc3c7',
+                                     autoSkip: true,
+                                     maxTicksLimit: 10,
+                                     font: {
+                                         size: 10 /* Smaller font for X-axis labels */
+                                     }
+                                 },
+                                 grid: {
+                                     color: '#222',
+                                     drawBorder: false
+                                 }
+                             },
+                             y: {
+                                 title: {
+                                     display: true,
+                                     text: 'Players',
+                                     color: '#bdc3c7'
+                                 },
+                                 ticks: {
+                                     color: '#bdc3c7',
+                                      callback: function(value, index, values) {
+                                         return formatPlayerCount(value);
+                                     }
+                                 },
+                                 grid: {
+                                     color: '#222',
+                                     drawBorder: false
+                                 }
+                             }
+                         },
+                         plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                enabled: true,
+                                 mode: 'index',
+                                 intersect: false,
+                                 callbacks: {
+                                     title: function(tooltipItems) {
+                                         return tooltipItems[0].label;
+                                     },
+                                     label: function(tooltipItem) {
+                                         return `Players: ${tooltipItem.formattedValue}`;
+                                     }
+                                 },
+                                 bodyColor: '#e0e0e0',
+                                 backgroundColor: '#16181d',
+                                 borderColor: '#333',
+                                 borderWidth: 1
+                             }
+                         }
+                     }
+                 });
+             }
+         }
+
+
+        function openIslandModal(island) { /* Removed discoveryPanelName parameter */
+             if (!island || !island.islandCode) {
+                 console.error("Cannot open modal: Invalid island data or missing code.");
+                 showCustomAlert("Island data not available.");
+                 return;
+             }
+
+             modalTitle.textContent = island.islandTitle || 'Island Details';
+             modalStats.innerHTML = '';
+
+             // Reset modal state
+             modalLoading.style.display = 'block'; // Loading for basic stats
+             modalError.style.display = 'none';
+             modalStats.style.display = 'none';
+             modalCopyButton.style.display = 'none';
+
+             placementSection.style.display = 'none'; // Hide placement section initially
+             placementLoading.style.display = 'none';
+             placementError.style.display = 'none';
+             modalPlacementList.innerHTML = ''; // Clear placement list
+             noPlacementMessage.style.display = 'none';
+
+             chartSection.style.display = 'none';
+             chartLoading.style.display = 'block';
+             if (playerChart) {
+                 playerChart.destroy();
+                 playerChart = null;
+             }
+             rawChartData = null;
+
+
+             islandModal.classList.add('show'); // Show the modal overlay
+
+
+             // Fetch detailed stats
+             const statsApiUrl = `https://fnzone.es/api/backend/v1/players/${island.islandCode}`;
+             fetch(statsApiUrl)
+                 .then(response => {
+                     if (!response.ok) {
+                         throw new Error(`HTTP error! status: ${response.status}`);
+                     }
+                     return response.json();
+                 })
+                 .then(data => {
+                     modalLoading.style.display = 'none'; // Hide basic stats loading
+                     chartLoading.style.display = 'none'; // Hide chart loading
+                     placementLoading.style.display = 'none'; // Hide placement loading
+
+
+                     if (data && data.success) {
+                        modalStats.style.display = 'flex'; // Show basic stats container
+                        modalCopyButton.style.display = 'block'; // Show copy button
+                        chartSection.style.display = 'block'; // Show chart section
+                        placementSection.style.display = 'block'; // Show placement section
+
+                        // Update basic stats
+                        const latestData = data.parsedData?.[0];
+                        modalStats.innerHTML = ''; // Clear and re-add basic stats to ensure order
+                        modalStats.appendChild(createStatLine('Current Players', formatPlayerCount(latestData?.ccu), '🧑‍🤝‍🧑'));
+                        modalStats.appendChild(createStatLine('Highest Players', formatPlayerCount(data.highestValue?.ccu), '🏆'));
+                        modalStats.appendChild(createStatLine('Highest At', formatDateTime(data.highestValue?.at)));
+                        modalStats.appendChild(createStatLine('Rank', data.islandTop || 'N/A'));
+                        modalStats.appendChild(createStatLine('Island Code', data.islandCode || island.islandCode || 'N/A'));
+
+
+                        activeIslandCode = data.islandCode || island.islandCode;
+                        rawChartData = data.parsedData;
+
+                         // Initialize chart with default range (Day)
+                        const initialChartData = filterChartData('D', rawChartData);
+                        renderChart(initialChartData);
+
+                         // Set active class on the default button
+                        chartControls.querySelector('button[data-range="D"]').classList.add('active');
+
+
+                        // Populate Discovery Placement List
+                        if (data.discoveryData && data.discoveryData.length > 0) {
+                            data.discoveryData.forEach(placement => {
+                                const listItem = document.createElement('li');
+                                listItem.classList.add('placement-item');
+
+                                const panelNameSpan = document.createElement('span');
+                                panelNameSpan.classList.add('placement-panel-name');
+                                panelNameSpan.textContent = placement.panelDisplayName || 'Unknown Panel';
+
+                                const rankSpan = document.createElement('span');
+                                rankSpan.classList.add('placement-rank');
+                                // IslandIndex is 0-based in the API, add 1 for display rank
+                                const displayRank = (placement.islandIndex != null) ? `#${placement.islandIndex + 1}` : 'N/A';
+                                rankSpan.textContent = displayRank;
+
+                                listItem.appendChild(panelNameSpan);
+                                listItem.appendChild(rankSpan);
+                                modalPlacementList.appendChild(listItem);
+                            });
+                             noPlacementMessage.style.display = 'none';
+                             modalPlacementList.style.display = 'flex'; // Show the list
+                        } else {
+                             // No placement data
+                             noPlacementMessage.style.display = 'block';
+                             modalPlacementList.style.display = 'none'; // Hide the empty list
+                        }
+
+
+                     } else {
+                         modalError.textContent = data?.error || 'Failed to load island details.';
+                         modalError.style.display = 'block';
+                         modalStats.style.display = 'none';
+                         modalCopyButton.style.display = 'none';
+                         chartSection.style.display = 'none';
+                         placementSection.style.display = 'none';
+                         activeIslandCode = null;
+                     }
+                 })
+                 .catch(error => {
+                     modalLoading.style.display = 'none';
+                     chartLoading.style.display = 'none';
+                     placementLoading.style.display = 'none';
+                     modalError.textContent = `Error fetching data: ${error.message}`;
+                     modalError.style.display = 'block';
+                     modalStats.style.display = 'none';
+                     modalCopyButton.style.display = 'none';
+                     chartSection.style.display = 'none';
+                     placementSection.style.display = 'none';
+                     console.error('Error fetching island data:', error);
+                     activeIslandCode = null;
+                 });
+         }
+
+         function closeIslandModal() {
+            islandModal.classList.remove('show');
+            activeIslandCode = null;
+            modalStats.innerHTML = '';
+            modalLoading.style.display = 'none';
+            modalError.style.display = 'none';
+            modalCopyButton.style.display = 'none';
+
+            placementSection.style.display = 'none';
+            placementLoading.style.display = 'none';
+            placementError.style.display = 'none';
+            modalPlacementList.innerHTML = '';
+            noPlacementMessage.style.display = 'none';
+
+
+            chartSection.style.display = 'none';
+            chartLoading.style.display = 'none';
+
+             if (playerChart) {
+                 playerChart.destroy();
+                 playerChart = null;
+             }
+            rawChartData = null;
+            chartControls.querySelectorAll('button').forEach(button => {
+                button.classList.remove('active');
+            });
+         }
+
+        modalClose.addEventListener('click', closeIslandModal);
+         islandModal.addEventListener('click', (event) => {
+             if (event.target === islandModal) {
+                 closeIslandModal();
+             }
+         });
+         document.addEventListener('keydown', (event) => {
+             if (event.key === 'Escape' && islandModal.classList.contains('show')) {
+                 closeIslandModal();
+             }
+         });
+
+        modalCopyButton.addEventListener('click', () => {
+             if (activeIslandCode) {
+                 navigator.clipboard.writeText(activeIslandCode).then(() => {
+                     showCustomAlert(`Code copied: ${activeIslandCode}`);
+                 }).catch(err => {
+                     console.error('Failed to copy code:', err);
+                     showCustomAlert(`Failed to copy code.`);
+                 });
+             } else {
+                showCustomAlert("Island code not available to copy.");
+             }
+        });
+
+         chartControls.addEventListener('click', (event) => {
+             const target = event.target;
+             if (target.tagName === 'BUTTON' && target.dataset.range && rawChartData) {
+                 chartControls.querySelectorAll('button').forEach(button => {
+                     button.classList.remove('active');
+                 });
+                 target.classList.add('active');
+
+                 const selectedRange = target.dataset.range;
+                 const filteredData = filterChartData(selectedRange, rawChartData);
+                 renderChart(filteredData);
+             }
+         });
+
 
         function displayCategories(categories) {
             initialLoading.style.display = 'none';
             container.style.display = 'flex';
+             setTimeout(() => {
+                 container.classList.add('show');
+             }, 50);
 
             discoveryContent.innerHTML = '';
             categoryList.innerHTML = '';
@@ -316,24 +1181,24 @@
 
                 categorySection.appendChild(title);
 
-                // Add category to the fast travel list (sidebar)
                 const categoryItem = document.createElement('li');
                 categoryItem.classList.add('category-item');
                 categoryItem.textContent = category.panelName;
                 categoryItem.addEventListener('click', () => {
-                    categorySection.scrollIntoView({ behavior: 'smooth' });
+                    const offset = document.querySelector('.sidebar-header').offsetHeight;
+                    const targetPosition = categorySection.getBoundingClientRect().top + window.scrollY - (offset + 20);
+                    window.scrollTo({ top: targetPosition, behavior: 'smooth' });
                 });
                 categoryList.appendChild(categoryItem);
 
                 const mapGrid = document.createElement('div');
                 mapGrid.classList.add('map-grid');
 
-                // Filter islands based on search term
                 const searchTerm = searchInput.value.toLowerCase();
                 const filteredIslands = category.results.filter(island =>
                     island.islandTitle.toLowerCase().includes(searchTerm) ||
                     island.islandCode.toLowerCase().includes(searchTerm) ||
-                    (island.creatorSlug && island.creatorSlug.toLowerCase().includes(searchTerm)) // Check creatorSlug
+                    (island.creatorSlug && island.creatorSlug.toLowerCase().includes(searchTerm))
                 );
 
                 if (filteredIslands.length > 0) {
@@ -341,10 +1206,11 @@
                     filteredIslands.forEach((island, index) => {
                         const islandCard = document.createElement('div');
                         islandCard.classList.add('island-card');
-                        islandCard.style.opacity = 0;
-                        setTimeout(() => {
-                            islandCard.style.opacity = 1;
-                        }, 50 * index);
+
+                        // Pass the island object directly to openIslandModal
+                        islandCard.addEventListener('click', () => {
+                            openIslandModal(island);
+                        });
 
                         const cardHeader = document.createElement('div');
                         cardHeader.classList.add('card-header');
@@ -363,10 +1229,11 @@
                         image.src = island.smallImage;
                         image.alt = island.islandTitle;
                         image.classList.add('island-image');
+                        image.loading = 'lazy';
 
                         const playerCount = document.createElement('span');
                         playerCount.classList.add('player-count');
-                        playerCount.textContent = formatPlayerCount(island.globalCCU || 0);
+                        playerCount.textContent = formatPlayerCount(island.globalCCU || 0) + ' Players 🧑‍🤝‍🧑';
                         imageContainer.appendChild(image);
                         imageContainer.appendChild(playerCount);
 
@@ -378,56 +1245,98 @@
                         const islandTitle = document.createElement('h3');
                         islandTitle.classList.add('island-title');
                         islandTitle.textContent = island.islandTitle;
-
                         cardBody.appendChild(islandTitle);
+
+                        if (island.creatorSlug) {
+                            const creatorName = document.createElement('p');
+                            creatorName.classList.add('creator-name');
+                            creatorName.textContent = `by ${island.creatorSlug}`;
+                            cardBody.appendChild(creatorName);
+                        }
+
+                         if (island.islandCode) {
+                            const islandCodeEl = document.createElement('p');
+                            islandCodeEl.classList.add('island-code');
+                            islandCodeEl.textContent = `${island.islandCode}`;
+                            cardBody.appendChild(islandCodeEl);
+
+                            islandCodeEl.addEventListener('click', (event) => {
+                                event.stopPropagation();
+                                navigator.clipboard.writeText(island.islandCode).then(() => {
+                                    showCustomAlert(`Code copied: ${island.islandCode}`);
+                                }).catch(err => {
+                                    console.error('Failed to copy code:', err);
+                                    showCustomAlert(`Failed to copy code.`);
+                                });
+                            });
+                        }
+
 
                         islandCard.appendChild(cardHeader);
                         islandCard.appendChild(cardBody);
-                        mapGrid.appendChild(islandCard);
+
+
+                        islandCard.style.opacity = 0;
+                        islandCard.dataset.index = index;
+                         mapGrid.appendChild(islandCard);
                     });
 
                     categorySection.appendChild(mapGrid);
                     discoveryContent.appendChild(categorySection);
-                } else {
-                    categorySection.style.opacity = 0;
+
                     setTimeout(() => {
-                        categorySection.style.display = 'none';
-                    }, 300);
+                        mapGrid.querySelectorAll('.island-card').forEach((card, cardIndex) => {
+                            setTimeout(() => {
+                                card.style.opacity = 1;
+                            }, 30 * cardIndex);
+                        });
+                     }, 50);
+                } else {
+                    categorySection.classList.add('hidden');
                 }
             });
 
-            // Filter sidebar category items
             const sidebarItems = document.querySelectorAll('#category-list .category-item');
             sidebarItems.forEach(item => {
-                if (visibleCategories.includes(item.textContent)) {
+                const categoryName = item.textContent;
+                const correspondingSection = discoveryContent.querySelector(`.category-section .category-title`)?.closest('.category-section');
+
+                 if (correspondingSection && !correspondingSection.classList.contains('hidden')) {
                     item.classList.remove('hidden');
                 } else {
                     item.classList.add('hidden');
                 }
             });
-
-            // Animate player counts (simple fade)
-            const playerCountElements = document.querySelectorAll('.player-count');
-            playerCountElements.forEach(el => {
-                el.style.opacity = 0.5;
-                setTimeout(() => {
-                    el.style.opacity = 1;
-                }, 300);
-            });
         }
 
         function fetchData() {
             fetch('https://fnzone.es/_next/data/TDYxmKfi6TY7EFeLq5QA8/en/creative.json')
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    allCategories = data.pageProps.data;
-                    displayCategories(allCategories);
-                    nextUpdateTime = Date.now() + updateInterval;
-                    updateCountdown();
+                    if (data && data.pageProps && data.pageProps.data) {
+                         allCategories = data.pageProps.data;
+                         displayCategories(allCategories);
+                         nextUpdateTime = Date.now() + updateInterval;
+                         updateCountdown();
+                    } else {
+                         throw new Error("Invalid data structure received.");
+                    }
                 })
                 .catch(error => {
-                    discoveryContent.innerHTML = '<p>An error occurred while loading data. 😭</p>';  // Crying face emoji
+                    initialLoading.style.display = 'none';
+                    container.style.display = 'flex';
+                     setTimeout(() => { container.classList.add('show'); }, 50);
+
+                    discoveryContent.innerHTML = '<p style="text-align: center; color: #e74c3c; margin-top: 50px;">An error occurred while loading data. Please try again later. 😭</p>';
                     console.error('Error loading data:', error);
+                    categoryList.innerHTML = '';
+                     nextUpdateTime = Date.now() + updateInterval;
+                     updateCountdown();
                 });
         }
 
@@ -438,22 +1347,20 @@
                 const seconds = Math.floor(timeLeft / 1000);
                 countdownElement.textContent = seconds + "s";
             } else {
-                countdownElement.textContent = "Updating... 🔄";  // Refresh emoji
+                countdownElement.textContent = "Updating... 🔄";
+                 fetchData();
             }
         }
 
         fetchData();
-        setInterval(fetchData, updateInterval);
         setInterval(updateCountdown, 100);
 
         searchInput.addEventListener('input', () => {
             displayCategories(allCategories);
         });
 
-        // --- "Back to Top" Arrow Functionality ---
-
         window.addEventListener('scroll', () => {
-            if (window.scrollY > 300) {  // Show after scrolling 300px (adjust as needed)
+            if (window.scrollY > 300) {
                 backToTopButton.classList.add('show');
             } else {
                 backToTopButton.classList.remove('show');
@@ -463,7 +1370,7 @@
         backToTopButton.addEventListener('click', () => {
             window.scrollTo({
                 top: 0,
-                behavior: 'smooth'   // Smooth scroll!
+                behavior: 'smooth'
             });
         });
     </script>
