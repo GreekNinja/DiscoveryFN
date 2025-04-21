@@ -1,528 +1,472 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fortnite Discovery</title>
-    <style>
+    <title>Fortnite Discovery 🗺️</title>  <style>
         @font-face {
-    font-family: "Burbank";
-    src: url("Burbank Big Condensed Black 700.ttf") format("truetype");
-}
+            font-family: 'Burbank Big Condensed';
+            src: url('path/to/BurbankBigCondensed-Black.ttf') format('truetype');
+            /* Replace with the actual path */
+            font-weight: 900;
+            font-style: normal;
+        }
 
-body {
-    font-family: "Burbank", Arial, sans-serif;
-    background-color: #0d0d0d;
-    color: #ffffff;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
-}
+        body {
+            font-family: 'Roboto Condensed', sans-serif;
+            margin: 0;
+            background-color: #0c0f14;
+            color: #e0e0e0;
+            padding: 20px;
+        }
 
-.container {
-    width: 95%;
-    margin: 0 auto;
-    padding: 10px;
-    animation: fadeIn 1s ease-in-out;
-}
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+        }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
+        /* Header Styles (Moved to Sidebar) */
+        .sidebar-header {
+            color: #fff;
+            font-family: 'Burbank Big Condensed', sans-serif;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
 
-.category {
-    margin-bottom: 30px;
-}
+        .search-bar {
+            background-color: #16181d;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            color: #bdc3c7;
+            width: 80%;
+            margin-bottom: 20px;
+        }
 
-.category-title {
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin-bottom: 10px;
-    text-shadow: 0 4px 8px rgba(0, 255, 255, 0.7);
-}
+        /* Sidebar Styles */
+        .sidebar {
+            width: 200px;
+            margin-right: 20px;
+            padding-top: 20px;
+        }
 
-.category-description {
-    font-size: 1.4rem;
-    margin-bottom: 15px;
-    color: #aaaaaa;
-}
+        .category-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
 
-.maps-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 15px;
-}
+        .category-item {
+            background-color: #16181d;
+            padding: 8px 15px;
+            border-radius: 5px;
+            color: #bdc3c7;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 5px;
+            position: relative; /* For the emoji animation */
+            overflow: hidden; /* Clip the bounce */
+        }
 
-.map-card {
-    background: linear-gradient(145deg, #1f1f1f, #292929);
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5), 0 3px 5px rgba(0, 0, 0, 0.3);
-    transition: transform 0.3s, box-shadow 0.3s;
-}
+        .category-item:hover {
+            background-color: #222;
+        }
 
-.map-card:hover {
-    transform: translateY(-8px) scale(1.05);
-    box-shadow: 0 10px 18px rgba(0, 255, 255, 0.5), 0 6px 15px rgba(0, 0, 0, 0.5);
-}
+        /* Main Content Styles */
+        #discovery-content {
+            flex: 1;
+        }
 
-.map-card img {
-    width: 100%;
-    height: 140px;
-    object-fit: cover;
-    border-bottom: 3px solid #00ffff;
-}
+        .category-title {
+            color: #fff;
+            font-family: 'Burbank Big Condensed', sans-serif;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
 
-.map-info {
-    padding: 15px;
-}
+        .discovery-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            max-width: calc(5 * (160px + 15px));
+        }
 
-.map-title {
-    font-size: 1.6rem;
-    font-weight: bold;
-    margin-bottom: 8px;
-    color: #00ffff;
-    text-shadow: 0 3px 6px rgba(0, 255, 255, 0.5);
-}
+        .island-card {
+            background-color: #16181d;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            width: 160px;
+            flex-shrink: 0;
+            transition: transform 0.2s ease-in-out, opacity 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+        }
 
-.map-creator {
-    font-size: 1.1rem;
-    color: #cccccc;
-    margin-bottom: 8px;
-}
+        .island-card:hover {
+            transform: scale(1.05);
+        }
 
-.map-ccu {
-    font-size: 1.2rem;
-    color: #ffffff;
-    font-weight: bold;
-    background: linear-gradient(90deg, #00ff00, #00ffff);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: pulse 1.5s infinite;
-}
+        .card-header {
+            position: relative;
+        }
 
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
-}
+        .rank {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-size: 0.7em;
+            font-weight: bold;
+            font-family: 'Burbank Big Condensed', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
 
-.top-bar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-color: #1a1a1a;
-    padding: 8px 16px;
-    z-index: 1000;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+        .island-image-container {
+            position: relative;
+        }
 
-.dropdown {
-    display: flex;
-    align-items: center;
-}
+        .island-image {
+            width: 100%;
+            height: 90px;
+            object-fit: cover;
+            display: block;
+        }
 
-.dropdown select {
-    font-family: "Burbank", Arial, sans-serif;
-    font-size: 1.2rem;
-    padding: 8px;
-    border: none;
-    border-radius: 6px;
-    background-color: #242424;
-    color: #00ffff;
-    outline: none;
-    cursor: pointer;
-}
+        .player-count {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 0.7em;
+            font-weight: bold;
+            z-index: 1;
+            transition: opacity 0.3s ease-in-out;
+            opacity: 1;
+            display: flex;         /* Flexbox */
+            align-items: center;    /* Vertical center */
+            justify-content: center; /* Horizontal center */
+            gap: 2px;               /* Space between text/emoji */
+        }
 
-.search {
-    display: flex;
-    justify-content: center; /* Κεντράρει τα περιεχόμενα */
-    align-items: center;
-    width: 100%; /* Διασφαλίζει ότι καταλαμβάνει όλο το πλάτος */
-}
-.search input {
-    font-family: "Burbank", Arial, sans-serif;
-    font-size: 1.5rem;
-    padding: 10px;
-    border: none;
-    border-radius: 8px;
-    background-color: #242424;
-    color: #ffffff;
-    outline: none;
-    margin-right: 10px;
-    width: 300px;
-}
-.search button {
-    font-family: "Burbank", Arial, sans-serif;
-    font-size: 1.5rem;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    background-color: #00ffff;
-    color: #0d0d0d;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-.search button:hover {
-    background-color: #00cccc;
-}
+        .card-body {
+            padding: 8px;
+            text-align: center;
+        }
 
-#errorMessage {
-    position: fixed;
-    top: 15px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #ff4d4d;
-    color: #ffffff;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
-    text-align: center;
-    z-index: 1000;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    opacity: 0;
-    visibility: hidden;
-    animation: none;
-}
+        .island-title {
+            font-weight: bold;
+            font-size: 0.8em;
+            color: #f0f0f0;
+            margin-bottom: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
 
-@keyframes fadeInOut {
-    0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
-    10% { opacity: 1; transform: translateX(-50%) translateY(0); }
-    90% { opacity: 1; transform: translateX(-50%) translateY(0); }
-    100% { opacity: 0; transform: translateX(-50%) translateY(10px); }
-}
+        #loading {
+            text-align: center;
+            margin-top: 20px;
+            font-style: italic;
+            color: #757575;
+            font-size: 1.2em;
+        }
 
-#totalPlayers {
-    font-size: 20px;
-    font-weight: bold;
-    color: #00cc00;
-    text-align: center;
-    margin-top: 15px;
-    animation: liveUpdateAnimation 1s ease-in-out infinite;
-}
+        .category-section {
+            margin-bottom: 30px;
+            transition: opacity 0.3s ease-in-out;
+            opacity: 1;
+        }
 
-@keyframes liveUpdateAnimation {
-    0% { transform: scale(1); color: #00cc00; }
-    50% { transform: scale(1.05); color: #ffcc00; }
-    100% { transform: scale(1); color: #00cc00; }
-}
+        .category-section:last-child {
+            margin-bottom: 0;
+        }
 
-.category-title {
-    font-size: 3rem;
-    font-weight: bold;
-    margin-bottom: 15px;
-    text-shadow: 0 4px 10px rgba(0, 255, 255, 0.7);
-    color: #00ffff; /* Χρώμα τίτλου */
-}
+        .map-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 15px;
+        }
 
-.category-description {
-    font-size: 1.8rem;
-    margin-bottom: 25px;
-    color: #aaaaaa;
-}
+        .hidden {
+            opacity: 0;
+            display: none;
+            transition: opacity 0.3s ease-in-out;
+        }
 
-/* Προαιρετικά για την εμφάνιση των τίτλων των νέων κατηγοριών */
-.category .category-title {
-    color: #ffcc00; /* Χρώμα για νέες κατηγορίες */
-}
+        #timer {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            z-index: 1000;
+            display: flex;       /* Flexbox for centering */
+            align-items: center;  /* Vertical centering */
+            justify-content: center; /* Horizontal centering */
+            gap: 5px;             /* Space between text and emoji */
+        }
 
-#totalPlayers {
-    position: fixed;
-    top: 70px; /* Απόσταση από την κορυφή για να το τοποθετήσεις κάτω από το search */
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 24px;
-    font-weight: bold;
-    color: #00cc00;
-    text-align: center;
-    animation: liveUpdateAnimation 1s ease-in-out infinite;
-    z-index: 1000;
-}
+        #back-to-top {
+            position: fixed;
+            bottom: 80px;  /* Adjusted to make space for timer */
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 1.5em;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+            display: flex;       /* Flexbox for centering */
+            align-items: center;  /* Vertical centering */
+            justify-content: center; /* Horizontal centering */
+        }
 
-@keyframes liveUpdateAnimation {
-    0% {
-        transform: scale(1);
-        color: #00cc00;
-    }
-    50% {
-        transform: scale(1.05);
-        color: #ffcc00;
-    }
-    100% {
-        transform: scale(1);
-        color: #00cc00;
-    }
-}
+        #back-to-top.show {
+            opacity: 1;
+        }
 
+        #initial-loading {
+            text-align: center;
+            margin-top: 20px;
+            font-style: italic;
+            color: #757575;
+            font-size: 2em; /* Bigger! */
+            opacity: 0;
+            transform: scale(0.8); /* Start smaller */
+            animation: initialLoadAnimation 1s ease-out forwards;
+        }
 
+        @keyframes initialLoadAnimation {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
     </style>
 </head>
+
 <body>
-    <div class="top-bar">
-        <div class="dropdown">
-            <select id="categoryDropdown" onchange="scrollToCategory()">
-                <option value="">Select a category...</option>
-            </select>
-        </div>
-        <div class="search">
-            <input type="text" id="searchInput" placeholder="Search by Creator, Code, or Island Name...">
-            <button onclick="searchMap()">Search</button>
-        </div>
+    <div id="initial-loading">Loading data... ⏳</div>  <div class="container" style="display: none;">
+        <aside class="sidebar">
+            <h1 class="sidebar-header">Fortnite Discovery 🗺️</h1> <input type="text" class="search-bar" id="search-input" placeholder="Search 🔍..."> <ul class="category-list" id="category-list">
+                </ul>
+        </aside>
+        <div id="discovery-content">
+            <p id="loading">Loading data... ⏳</p>  </div>
     </div>
-    <div class="container">
-        <div id="categories"></div>
-    </div>
-    <div id="errorMessage" class="error-message">The map you are looking for is not in the discovery</div>
-<div id="totalPlayers">Total Players Across All Maps: 0</div>
-<script>
-    // Format numbers with commas
-    function formatNumber(num) {
-        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    }
+    <div id="back-to-top">⬆️</div>  <div id="timer">Next update in: <span id="countdown"></span> ⏱️</div> <script>
+        const initialLoading = document.getElementById('initial-loading');
+        const container = document.querySelector('.container');
+        const discoveryContent = document.getElementById('discovery-content');
+        const categoryList = document.getElementById('category-list');
+        const searchInput = document.getElementById('search-input');
+        const countdownElement = document.getElementById('countdown');
+        const updateInterval = 30000; // 30 seconds (was 60000)
+        let nextUpdateTime;
+        const backToTopButton = document.getElementById('back-to-top'); // Get the arrow
 
-    // Animate count-up for the players online counter
-    function animateCountUp(element, oldValue, newValue, duration) {
-        if (oldValue === newValue) return; // Skip animation if the value hasn't changed
+        let allCategories = [];
 
-        let startTime = null;
+        function formatPlayerCount(count) {
+            if (count >= 1000) {
+                return (count / 1000).toFixed(1) + "K Players 🧑‍🤝‍🧑";  // Players emoji
+            }
+            return count + " Players 🧑‍🤝‍🧑";  // Players emoji
+        }
 
-        function step(currentTime) {
-            if (!startTime) startTime = currentTime;
-            const progress = Math.min((currentTime - startTime) / duration, 1);
-            const value = Math.floor(progress * (newValue - oldValue) + oldValue);
-            element.textContent = `Players Online: ${formatNumber(value)}`;
-            if (progress < 1) {
-                requestAnimationFrame(step);
+        function displayCategories(categories) {
+            initialLoading.style.display = 'none';
+            container.style.display = 'flex';
+
+            discoveryContent.innerHTML = '';
+            categoryList.innerHTML = '';
+
+            const visibleCategories = [];
+
+            categories.forEach(category => {
+                const categorySection = document.createElement('div');
+                categorySection.classList.add('category-section');
+
+                const title = document.createElement('h2');
+                title.classList.add('category-title');
+                title.textContent = category.panelName;
+
+                categorySection.appendChild(title);
+
+                // Add category to the fast travel list (sidebar)
+                const categoryItem = document.createElement('li');
+                categoryItem.classList.add('category-item');
+                categoryItem.textContent = category.panelName;
+                categoryItem.addEventListener('click', () => {
+                    categorySection.scrollIntoView({ behavior: 'smooth' });
+                });
+                categoryList.appendChild(categoryItem);
+
+                const mapGrid = document.createElement('div');
+                mapGrid.classList.add('map-grid');
+
+                // Filter islands based on search term
+                const searchTerm = searchInput.value.toLowerCase();
+                const filteredIslands = category.results.filter(island =>
+                    island.islandTitle.toLowerCase().includes(searchTerm) ||
+                    island.islandCode.toLowerCase().includes(searchTerm) ||
+                    (island.creatorSlug && island.creatorSlug.toLowerCase().includes(searchTerm)) // Check creatorSlug
+                );
+
+                if (filteredIslands.length > 0) {
+                    visibleCategories.push(category.panelName);
+                    filteredIslands.forEach((island, index) => {
+                        const islandCard = document.createElement('div');
+                        islandCard.classList.add('island-card');
+                        islandCard.style.opacity = 0;
+                        setTimeout(() => {
+                            islandCard.style.opacity = 1;
+                        }, 50 * index);
+
+                        const cardHeader = document.createElement('div');
+                        cardHeader.classList.add('card-header');
+
+                        if (island.islandRank) {
+                            const rank = document.createElement('span');
+                            rank.classList.add('rank');
+                            rank.textContent = island.islandRank;
+                            cardHeader.appendChild(rank);
+                        }
+
+                        const imageContainer = document.createElement('div');
+                        imageContainer.classList.add('island-image-container');
+
+                        const image = document.createElement('img');
+                        image.src = island.smallImage;
+                        image.alt = island.islandTitle;
+                        image.classList.add('island-image');
+
+                        const playerCount = document.createElement('span');
+                        playerCount.classList.add('player-count');
+                        playerCount.textContent = formatPlayerCount(island.globalCCU || 0);
+                        imageContainer.appendChild(image);
+                        imageContainer.appendChild(playerCount);
+
+                        cardHeader.appendChild(imageContainer);
+
+                        const cardBody = document.createElement('div');
+                        cardBody.classList.add('card-body');
+
+                        const islandTitle = document.createElement('h3');
+                        islandTitle.classList.add('island-title');
+                        islandTitle.textContent = island.islandTitle;
+
+                        cardBody.appendChild(islandTitle);
+
+                        islandCard.appendChild(cardHeader);
+                        islandCard.appendChild(cardBody);
+                        mapGrid.appendChild(islandCard);
+                    });
+
+                    categorySection.appendChild(mapGrid);
+                    discoveryContent.appendChild(categorySection);
+                } else {
+                    categorySection.style.opacity = 0;
+                    setTimeout(() => {
+                        categorySection.style.display = 'none';
+                    }, 300);
+                }
+            });
+
+            // Filter sidebar category items
+            const sidebarItems = document.querySelectorAll('#category-list .category-item');
+            sidebarItems.forEach(item => {
+                if (visibleCategories.includes(item.textContent)) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+
+            // Animate player counts (simple fade)
+            const playerCountElements = document.querySelectorAll('.player-count');
+            playerCountElements.forEach(el => {
+                el.style.opacity = 0.5;
+                setTimeout(() => {
+                    el.style.opacity = 1;
+                }, 300);
+            });
+        }
+
+        function fetchData() {
+            fetch('https://fnzone.es/_next/data/TDYxmKfi6TY7EFeLq5QA8/en/creative.json')
+                .then(response => response.json())
+                .then(data => {
+                    allCategories = data.pageProps.data;
+                    displayCategories(allCategories);
+                    nextUpdateTime = Date.now() + updateInterval;
+                    updateCountdown();
+                })
+                .catch(error => {
+                    discoveryContent.innerHTML = '<p>An error occurred while loading data. 😭</p>';  // Crying face emoji
+                    console.error('Error loading data:', error);
+                });
+        }
+
+        function updateCountdown() {
+            const timeLeft = nextUpdateTime - Date.now();
+
+            if (timeLeft > 0) {
+                const seconds = Math.floor(timeLeft / 1000);
+                countdownElement.textContent = seconds + "s";
+            } else {
+                countdownElement.textContent = "Updating... 🔄";  // Refresh emoji
             }
         }
 
-        requestAnimationFrame(step);
-    }
+        fetchData();
+        setInterval(fetchData, updateInterval);
+        setInterval(updateCountdown, 100);
 
-    function showError(message) {
-    const errorMessageElement = document.getElementById("errorMessage");
-    errorMessageElement.textContent = message;
-    
-    // Show the error message
-    errorMessageElement.style.visibility = "visible"; 
-    errorMessageElement.style.opacity = 1;
-    errorMessageElement.style.animation = "fadeInOut 10s ease-in-out forwards";
+        searchInput.addEventListener('input', () => {
+            displayCategories(allCategories);
+        });
 
-    // Automatically hide the error message after 10 seconds
-    setTimeout(() => {
-        errorMessageElement.style.visibility = "hidden"; 
-        errorMessageElement.style.opacity = 0;
-    }, 10000); // 10 seconds
-}
+        // --- "Back to Top" Arrow Functionality ---
 
-
-
-    // Search for maps based on input
-    function searchMap() {
-        const query = document.getElementById("searchInput").value.toLowerCase();
-        const categoriesContainer = document.getElementById("categories");
-        const maps = categoriesContainer.querySelectorAll(".map-card");
-
-        let found = false;
-        maps.forEach(map => {
-            const title = map.querySelector(".map-title").textContent.toLowerCase();
-            const creator = map.querySelector(".map-creator").textContent.toLowerCase();
-
-            if (title.includes(query) || creator.includes(query)) {
-                map.scrollIntoView({ behavior: "smooth" });
-                found = true;
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {  // Show after scrolling 300px (adjust as needed)
+                backToTopButton.classList.add('show');
+            } else {
+                backToTopButton.classList.remove('show');
             }
         });
 
-        if (!found) {
-            showError("The map you are looking for is not in the discovery");
-        }
-    }
-
-    // Update CCU values for all maps
-    async function updateCCUOnly() {
-        try {
-            const response = await fetch("https://fnzone.es/_next/data/Jm1aueX7SHfKWFWA433HQ/en/creative.json");
-            const data = await response.json();
-
-            const categoriesContainer = document.getElementById("categories");
-            const maps = categoriesContainer.querySelectorAll(".map-card");
-
-            maps.forEach(map => {
-                const mapTitle = map.querySelector(".map-title").textContent;
-                const ccuElement = map.querySelector(".map-ccu");
-
-                data.pageProps.data.forEach(category => {
-                    category.results.forEach(apiMap => {
-                        if (apiMap.islandTitle === mapTitle) {
-                            const newCCU = apiMap.globalCCU || 0;
-                            const oldCCU = parseInt(ccuElement.textContent.replace(/[^\d]/g, "")) || 0;
-                            animateCountUp(ccuElement, oldCCU, newCCU, 2000);
-                        }
-                    });
-                });
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'   // Smooth scroll!
             });
-        } catch (error) {
-            console.error("Error updating CCU data:", error);
-        }
-    }
-
-    // Fetch and render data for categories and maps
-    async function fetchDataAndRender(showAll = false) {
-        try {
-            const response = await fetch("https://fnzone.es/_next/data/Jm1aueX7SHfKWFWA433HQ/en/creative.json");
-            const data = await response.json();
-
-            const categoriesContainer = document.getElementById("categories");
-            const dropdown = document.getElementById("categoryDropdown");
-            categoriesContainer.innerHTML = ""; // Clear previous content
-            dropdown.innerHTML = '<option value="">Select a category...</option>'; // Clear dropdown
-
-            let totalPlayers = 0;
-
-            // Show all maps if 'showAll' is true
-            if (showAll) {
-                const allMapsGrid = document.createElement("div");
-                allMapsGrid.classList.add("maps-grid");
-
-                data.pageProps.data.forEach(category => {
-                    category.results.forEach(map => {
-                        totalPlayers += map.globalCCU || 0;
-                        const mapCard = createMapCard(map);
-                        allMapsGrid.appendChild(mapCard);
-                    });
-                });
-
-                categoriesContainer.appendChild(allMapsGrid);
-            } else {
-                // Loop through all categories
-                data.pageProps.data.forEach(category => {
-                    const categoryId = category.panelName.replace(/\s+/g, "-").toLowerCase();
-
-                    // Add category to dropdown
-                    const option = document.createElement("option");
-                    option.value = categoryId;
-                    option.textContent = category.panelName;
-                    dropdown.appendChild(option);
-
-                    // Create category section
-                    const categoryDiv = document.createElement("div");
-                    categoryDiv.classList.add("category");
-                    categoryDiv.id = categoryId;
-
-                    // Add category title
-                    const title = document.createElement("h2");
-                    title.classList.add("category-title");
-                    title.textContent = category.panelName;
-                    categoryDiv.appendChild(title);
-
-                    // Add category description if available
-                    if (category.panelSubtitle) {
-                        const description = document.createElement("p");
-                        description.classList.add("category-description");
-                        description.textContent = category.panelSubtitle;
-                        categoryDiv.appendChild(description);
-                    }
-
-                    // Create grid for maps
-                    const mapsGrid = document.createElement("div");
-                    mapsGrid.classList.add("maps-grid");
-
-                    category.results.forEach(map => {
-                        totalPlayers += map.globalCCU || 0;
-                        const mapCard = createMapCard(map);
-                        mapsGrid.appendChild(mapCard);
-                    });
-
-                    categoryDiv.appendChild(mapsGrid);
-                    categoriesContainer.appendChild(categoryDiv);
-                });
-            }
-
-            // Update total players live
-            updateTotalPlayers(totalPlayers);
-        } catch (error) {
-            console.error("Error fetching or processing data:", error);
-        }
-    }
-
-    // Create a map card with image, title, and CCU
-    function createMapCard(map) {
-        const mapCard = document.createElement("div");
-        mapCard.classList.add("map-card");
-
-        // Add map image
-        const mapImage = document.createElement("img");
-        mapImage.src = map.smallImage || "https://via.placeholder.com/280x160";
-        mapImage.alt = map.islandTitle;
-        mapCard.appendChild(mapImage);
-
-        // Add map info
-        const mapInfo = document.createElement("div");
-        mapInfo.classList.add("map-info");
-
-        const mapTitle = document.createElement("p");
-        mapTitle.classList.add("map-title");
-        mapTitle.textContent = map.islandTitle;
-        mapInfo.appendChild(mapTitle);
-
-        const mapCreator = document.createElement("p");
-        mapCreator.classList.add("map-creator");
-        mapCreator.textContent = `Creator: ${map.creatorSlug || "Unknown"}`;
-        mapInfo.appendChild(mapCreator);
-
-        const mapCCU = document.createElement("p");
-        mapCCU.classList.add("map-ccu");
-        mapCCU.textContent = "Players Online: 0";
-        mapInfo.appendChild(mapCCU);
-
-        // Animate CCU numbers
-        if (map.globalCCU) {
-            animateCountUp(mapCCU, 0, map.globalCCU, 2000);
-        }
-
-        mapCard.appendChild(mapInfo);
-        return mapCard;
-    }
-
-    // Update the total players count
-    function updateTotalPlayers(totalPlayers) {
-        const totalPlayersElement = document.getElementById("totalPlayers");
-        totalPlayersElement.textContent = `Total Players Across All Maps: ${formatNumber(totalPlayers)}`;
-
-        // Apply live update animation
-        totalPlayersElement.classList.add("live-update");
-    }
-
-    // Scroll to selected category
-    function scrollToCategory() {
-        const selectedCategory = document.getElementById("categoryDropdown").value;
-        const categoryDiv = document.getElementById(selectedCategory);
-
-        if (categoryDiv) {
-            categoryDiv.scrollIntoView({ behavior: "smooth" });
-        }
-    }
-
-    // Fetch data initially
-    fetchDataAndRender();
-
-    // Update CCU values only every 10 seconds
-    setInterval(updateCCUOnly, 10000);
-
-    // Show all maps when button is clicked
-    document.getElementById("showAllMapsBtn").addEventListener("click", function() {
-        fetchDataAndRender(true);
-    });
-
-    // Add event listener to category dropdown to scroll to the selected category
-    document.getElementById("categoryDropdown").addEventListener("change", scrollToCategory);
-</script>
-
+        });
+    </script>
 </body>
+
 </html>
