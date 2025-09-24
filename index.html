@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fortnite Island Stats</title>
+    <title>Island & Creator Stats</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -124,7 +124,7 @@
     <div class="container mx-auto p-4 md:p-8">
         <header class="text-center mb-8">
             <h1 class="text-4xl md:text-5xl font-extrabold text-white tracking-tight">
-                <i class="fas fa-gamepad text-[#ffc700]"></i> Fortnite <span class="text-[#ffc700]">Island & Creator</span> Info
+                <i class="fas fa-gamepad text-[#ffc700]"></i> <span class="text-[#ffc700]">Island & Creator</span>
             </h1>
             <p class="text-gray-400 mt-2">Search, track, and analyze info for any Fortnite island or creator.</p>
         </header>
@@ -387,13 +387,19 @@
                     // Add new
                     panels[panelName].forEach(map => {
                           if(!existingCards.has(map.id)) {
-                              const creatorName = map.owner_name || (map.owner_code === null ? 'Epic Games' : map.owner_code);
-                              const creatorCode = map.owner_code || 'epic';
+                              let creatorName = map.owner_name || map.owner_code;
+                              let creatorCode = map.owner_code;
+                              
+                              if (!creatorCode) { // Catches null, undefined, or empty string for Epic Games maps
+                                  creatorName = 'Epic Games';
+                                  creatorCode = 'epic'; // Use a default code for the link to work
+                              }
+
                               const card = document.createElement('div');
                               card.className = 'card rounded-lg overflow-hidden cursor-pointer flex flex-col fade-in';
                               card.dataset.mapId = map.id;
                               card.innerHTML = `
-                                  <img src="${map.image_url}" alt="${map.name}" class="w-full h-40 object-cover" onerror="this.onerror=null;this.src='https.onerror=null;this.src='https://placehold.co/400x200/1e1e1e/e0e0e0?text=No+Image';';">
+                                  <img src="${map.image_url}" alt="${map.name}" class="w-full h-40 object-cover" onerror="this.onerror=null;this.src='https.placehold.co/400x200/1e1e1e/e0e0e0?text=No+Image';">
                                   <div class="p-4 flex-grow flex flex-col">
                                       <h3 class="font-bold text-lg truncate" title="${map.name}">${map.name}</h3>
                                       <p class="text-gray-400 text-sm mb-2">by <span class="text-white hover:text-[#ffc700] cursor-pointer" onclick="event.stopPropagation(); searchCreator('${creatorCode}')">${creatorName}</span></p>
@@ -443,12 +449,12 @@
             let creatorName = details.owner_name || (ownerCode.toLowerCase().includes('epic') ? 'Epic Games' : ownerCode);
         
             mapDetailsContainer.innerHTML = `
-                <img src="${details.image_url}" alt="${details.name}" class="w-full rounded-lg mb-4" onerror="this.onerror=null;this.src='https.onerror=null;this.src='https://placehold.co/600x300/1e1e1e/e0e0e0?text=No+Image';';">
+                <img src="${details.image_url}" alt="${details.name}" class="w-full rounded-lg mb-4" onerror="this.onerror=null;this.src='https.placehold.co/600x300/1e1e1e/e0e0e0?text=No+Image';">
                 <h2 class="text-3xl font-extrabold text-[#ffc700]">${details.name}</h2>
                 <p class="text-gray-400 text-lg mb-4">${details.id}</p>
                 
                  <div class="flex items-center mb-4 cursor-pointer" onclick="searchCreator('${ownerCode}')">
-                     ${creator ? `<img src="${creator.lookup_avatar}" alt="${creator.name}" class="w-12 h-12 rounded-full mr-3" onerror="this.onerror=null;this.src='https.onerror=null;this.src='https://placehold.co/48x48/1e1e1e/e0e0e0?text=N/A';';">` : ''}
+                     ${creator ? `<img src="${creator.lookup_avatar}" alt="${creator.name}" class="w-12 h-12 rounded-full mr-3" onerror="this.onerror=null;this.src='https.placehold.co/48x48/1e1e1e/e0e0e0?text=N/A';">` : ''}
                      <div>
                          <p class="font-semibold text-white hover:text-[#ffc700]">${creatorName}</p>
                          <p class="text-sm text-gray-400">@${ownerCode}</p>
@@ -535,7 +541,7 @@
                   maps.forEach(map => {
                       content += `
                           <div class="card rounded-lg overflow-hidden cursor-pointer" onclick="location.hash = '#islands?code=${map.id}'">
-                              <img src="${map.image_url}" alt="${map.name}" class="w-full h-32 object-cover" onerror="this.onerror=null;this.src='https.onerror=null;this.src='https://placehold.co/400x200/1e1e1e/e0e0e0?text=No+Image';';">
+                              <img src="${map.image_url}" alt="${map.name}" class="w-full h-32 object-cover" onerror="this.onerror=null;this.src='https.placehold.co/400x200/1e1e1e/e0e0e0?text=No+Image';">
                               <div class="p-3">
                                   <h4 class="font-bold truncate" title="${map.name}">${map.name}</h4>
                               </div>
@@ -550,7 +556,7 @@
             creatorProfileContainer.innerHTML = `
                 <h2 class="text-2xl font-bold mb-4 text-[#ffc700]">Creator Profile</h2>
                 <div class="flex flex-col items-center">
-                    <img src="${creator.lookup_avatar}" alt="${creator.name}" class="w-32 h-32 rounded-full mb-4 border-4 border-[#ffc700]" onerror="this.onerror=null;this.src='https.onerror=null;this.src='https://placehold.co/128x128/1e1e1e/e0e0e0?text=N/A';';">
+                    <img src="${creator.lookup_avatar}" alt="${creator.name}" class="w-32 h-32 rounded-full mb-4 border-4 border-[#ffc700]" onerror="this.onerror=null;this.src='https.placehold.co/128x128/1e1e1e/e0e0e0?text=N/A';">
                     <h3 class="text-2xl font-bold text-white">${creator.name}</h3>
                     <p class="text-gray-400">@${creator.id}</p>
                      <p class="text-gray-300 mt-2"><i class="fas fa-users mr-2"></i>${creator.lookup_follower_count.toLocaleString()} Followers</p>
@@ -572,7 +578,7 @@
                 maps.forEach(map => {
                     content += `
                         <div class="card rounded-lg overflow-hidden cursor-pointer flex flex-col" onclick="location.hash = '#islands?code=${map.id}'">
-                            <img src="${map.image_url}" alt="${map.name}" class="w-full h-40 object-cover" onerror="this.onerror=null;this.src='https.onerror=null;this.src='https://placehold.co/400x200/1e1e1e/e0e0e0?text=No+Image';';">
+                            <img src="${map.image_url}" alt="${map.name}" class="w-full h-40 object-cover" onerror="this.onerror=null;this.src='https.placehold.co/400x200/1e1e1e/e0e0e0?text=No+Image';">
                             <div class="p-4 flex-grow flex flex-col">
                                 <h3 class="font-bold text-lg truncate" title="${map.name}">${map.name}</h3>
                                 <p class="text-gray-400 text-sm mb-2">${map.id}</p>
@@ -746,13 +752,26 @@
             if (creatorCode) location.hash = `#creators?name=${creatorCode}`;
         });
 
-        backToIslandSearchBtn.addEventListener('click', () => { location.hash = '#islands'; });
-        backToCreatorSearchBtn.addEventListener('click', () => { location.hash = '#creators'; });
+        backToIslandSearchBtn.addEventListener('click', () => {
+            // Force reset to the search view for islands
+            location.hash = '#islands';
+            if(location.hash === '#islands') { // If hash doesn't change, manually trigger
+                handleUrlChange();
+            }
+        });
+        backToCreatorSearchBtn.addEventListener('click', () => {
+             // Force reset to the search view for creators
+            location.hash = '#creators';
+             if(location.hash === '#creators') { // If hash doesn't change, manually trigger
+                handleUrlChange();
+            }
+        });
 
         tabButtons.forEach(button => {
             button.addEventListener('click', (e) => {
                 const newTab = e.currentTarget.dataset.tab;
-                if (location.hash !== `#${newTab}`) {
+                const currentTab = location.hash.split('?')[0];
+                if (currentTab !== `#${newTab}`) {
                     location.hash = `#${newTab}`;
                 }
             });
