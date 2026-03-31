@@ -1,794 +1,495 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Island & Creator Stats</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #1a1a1a;
-            color: #f0f0f0;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23ffc700' fill-opacity='0.05' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.99 7.5V30L0 22.5zM28 15L15 22.5V30L28 22.5z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        }
-        .card {
-            background-color: #2c2c2c;
-            border: 1px solid #4a4a4a;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.5s ease;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(255, 199, 0, 0.1);
-        }
-        .btn-primary {
-            background-color: #ffc700;
-            color: #1a1a1a;
-            font-weight: 700;
-            transition: background-color 0.3s ease;
-        }
-        .btn-primary:hover {
-            background-color: #e6b300;
-        }
-        .loader {
-            border: 4px solid #4a4a4a;
-            border-top: 4px solid #ffc700;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .status-up {
-            color: #ffc700;
-        }
-        .status-down {
-            color: #ff4d4d;
-        }
-        .tab-btn {
-            padding: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            color: #a0aec0;
-            transition: color 0.3s ease, border-color 0.3s ease;
-        }
-        .tab-btn:hover {
-            color: #f0f0f0;
-        }
-        .tab-btn.active {
-            color: #ffc700;
-            border-bottom-color: #ffc700;
-        }
-        .tab-pane {
-            display: none;
-        }
-        .tab-pane.active {
-            display: block;
-        }
-        .panel-header {
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            background-color: #2a2a2a;
-            border-radius: 0.5rem;
-            transition: background-color 0.3s ease;
-        }
-        .panel-header:hover {
-            background-color: #3a3a3a;
-        }
-        .panel-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease-out;
-            padding-top: 0;
-        }
-        .panel-header.active + .panel-content {
-             transition: max-height 0.5s ease-in;
-        }
-        .panel-icon {
-            transition: transform 0.3s ease;
-        }
-        .panel-header.active .panel-icon {
-            transform: rotate(180deg);
-        }
-        .live-row {
-            background-color: rgba(255, 199, 0, 0.1);
-            border-left: 4px solid #ffc700;
-        }
-        .fade-out {
-            opacity: 0;
-        }
-        .fade-in {
-            animation: fadeIn 0.5s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .count-up, .count-down {
-            transition: color 0.3s ease;
-        }
-        .count-up { color: #22c55e; }
-        .count-down { color: #ef4444; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FN Pulse — Island & Creator Stats</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--bg:#070710;--card:#0f0f1a;--card-h:#151524;--elev:#1a1a2e;
+--ac:#00e5ff;--ag:rgba(0,229,255,.2);--ad:rgba(0,229,255,.07);
+--pk:#ff3cac;--pg:rgba(255,60,172,.15);
+--gn:#22c55e;--rd:#ef4444;--or:#f59e0b;
+--t1:#eaeaf0;--t2:#7a7a90;--t3:#44445a;
+--bd:rgba(255,255,255,.05);--ba:rgba(0,229,255,.12);
+--r:14px;--rs:10px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 800px 500px at 10% 0%,rgba(0,229,255,.035) 0%,transparent 70%),radial-gradient(ellipse 600px 600px at 90% 90%,rgba(255,60,172,.025) 0%,transparent 70%);pointer-events:none;z-index:0}
+.app{position:relative;z-index:1;max-width:1440px;margin:0 auto;padding:1rem 1.25rem}
+.header{text-align:center;padding:2rem 0 .75rem}
+.logo{display:inline-flex;align-items:center;gap:.55rem;font-size:1.85rem;font-weight:900;letter-spacing:-.03em;background:linear-gradient(135deg,var(--ac),var(--pk));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.logo .dot{width:9px;height:9px;background:var(--ac);border-radius:50%;animation:pulse 2s infinite;box-shadow:0 0 10px var(--ag)}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.35}}
+.hsub{color:var(--t2);font-size:.82rem;margin-top:.25rem}
+
+/* Live indicator */
+.live-ind{display:inline-flex;align-items:center;gap:.35rem;font-size:.65rem;color:var(--gn);font-weight:600;margin-top:.4rem}
+.live-dot{width:6px;height:6px;background:var(--gn);border-radius:50%;animation:pulse 1.5s infinite}
+.refresh-timer{color:var(--t3);font-size:.6rem;margin-left:.5rem}
+
+.tnav{display:flex;justify-content:center;gap:3px;margin:1rem auto 1.5rem;background:var(--card);border:1px solid var(--bd);border-radius:100px;padding:3px;max-width:500px}
+.tb{flex:1;padding:.55rem .7rem;font-family:'Outfit',sans-serif;font-weight:600;font-size:.78rem;border:none;background:0;color:var(--t2);border-radius:100px;cursor:pointer;transition:.3s;white-space:nowrap}
+.tb:hover{color:var(--t1)}
+.tb.active{background:linear-gradient(135deg,var(--ac),rgba(0,229,255,.6));color:var(--bg);box-shadow:0 3px 14px var(--ag)}
+.tb i{margin-right:.3rem;font-size:.7rem}
+.pane{display:none;animation:su .3s ease}.pane.active{display:block}
+@keyframes su{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+.card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;transition:transform .3s cubic-bezier(.4,0,.2,1),box-shadow .3s,border-color .3s}
+.card:hover{transform:translateY(-3px);box-shadow:0 10px 35px rgba(0,0,0,.3),0 0 0 1px var(--ba);border-color:var(--ba)}
+.cb{padding:1.1rem}
+.stat{background:var(--card);border:1px solid var(--bd);border-radius:var(--rs);padding:.75rem .9rem;text-align:center}
+.sl{font-size:.6rem;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);font-weight:600;margin-bottom:.1rem}
+.sv{font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:700}.sv.aclr{color:var(--ac)}
+
+.srch{max-width:560px;margin:0 auto 1.75rem;position:relative}
+.srch input{width:100%;padding:.8rem .8rem .8rem 2.6rem;font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:500;background:var(--card);border:1px solid var(--bd);border-radius:100px;color:var(--t1);outline:0;transition:.3s}
+.srch input::placeholder{color:var(--t3)}
+.srch input:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--ad),0 5px 24px rgba(0,0,0,.3)}
+.srch .si{position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--t3);font-size:.8rem;pointer-events:none}
+.srch button{position:absolute;right:4px;top:50%;transform:translateY(-50%);padding:.5rem 1.2rem;font-family:'Outfit',sans-serif;font-weight:700;font-size:.75rem;background:linear-gradient(135deg,var(--ac),rgba(0,229,255,.6));color:var(--bg);border:none;border-radius:100px;cursor:pointer;transition:.2s}
+.srch button:hover{transform:translateY(-50%) scale(1.03);box-shadow:0 3px 14px var(--ag)}
+.bk{display:inline-flex;align-items:center;gap:.35rem;padding:.45rem 1rem;font-family:'Outfit',sans-serif;font-weight:600;font-size:.73rem;background:var(--elev);border:1px solid var(--bd);color:var(--t2);border-radius:100px;cursor:pointer;margin-bottom:1.1rem;transition:.25s}
+.bk:hover{color:var(--ac);border-color:var(--ba)}
+
+.stt{font-size:1.3rem;font-weight:800;letter-spacing:-.02em;margin-bottom:.85rem}.stt .ac{color:var(--ac)}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:.9rem}
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:.9rem}
+.gf{grid-column:1/-1}
+@media(max-width:1200px){.g5{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:1024px){.g4,.g5{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:768px){.g2,.g3,.g4,.g5{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:500px){.g2,.g3,.g4,.g5{grid-template-columns:1fr}.tb{font-size:.68rem;padding:.45rem .4rem}.tb i{display:none}}
+
+/* Map card */
+.mc{cursor:pointer;position:relative}
+.mc .iw{overflow:hidden;border-radius:var(--r) var(--r) 0 0;position:relative}
+.mc .iw::after{content:'';position:absolute;bottom:0;left:0;right:0;height:50%;background:linear-gradient(to top,var(--card),transparent);pointer-events:none}
+.mc img.mi{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;transition:transform .4s cubic-bezier(.4,0,.2,1)}
+.mc:hover img.mi{transform:scale(1.05)}
+.mc .pn{position:absolute;top:.5rem;left:.5rem;font-family:'Space Mono',monospace;font-size:.55rem;font-weight:700;background:rgba(0,0,0,.5);color:var(--t1);padding:.12rem .4rem;border-radius:4px;z-index:2;backdrop-filter:blur(4px)}
+.mc .ccb{position:absolute;bottom:.45rem;left:.55rem;display:flex;align-items:center;gap:.25rem;font-family:'Space Mono',monospace;font-size:.65rem;font-weight:700;color:var(--ac);z-index:2;text-shadow:0 1px 4px rgba(0,0,0,.6)}
+.mc .mm{padding:.7rem .8rem}
+.mc .mn{font-weight:700;font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.1rem}
+.mc .mcr{font-size:.68rem;color:var(--t2)}
+.mc .mcr span{color:var(--t1);cursor:pointer;transition:.2s}
+.mc .mcr span:hover{color:var(--ac)}
+.mc .mt{display:flex;flex-wrap:wrap;gap:.2rem;margin-top:.4rem}
+.mc .mtg{font-size:.5rem;padding:.1rem .35rem;background:var(--ad);color:var(--ac);border-radius:100px;font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+
+.psec{margin-bottom:2rem}
+.ptr{display:flex;align-items:center;gap:.5rem;margin-bottom:.7rem;padding-bottom:.4rem;border-bottom:1px solid var(--bd)}
+.pnm{font-size:1rem;font-weight:800;background:linear-gradient(135deg,var(--ac),var(--pk));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.pcnt{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--t3);font-weight:600}
+.ppl{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--ac);font-weight:600;margin-left:auto}
+
+.dm{display:flex;flex-wrap:wrap;gap:.35rem;justify-content:center;margin-bottom:1.5rem}
+.dmc{font-size:.6rem;padding:.25rem .6rem;background:var(--card);border:1px solid var(--bd);border-radius:100px;color:var(--t3)}
+.dmc strong{color:var(--t2);font-weight:600}
+
+.dt{width:100%;border-collapse:collapse;font-size:.73rem}
+.dt thead th{text-align:left;padding:.55rem .75rem;font-size:.58rem;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);font-weight:700;border-bottom:1px solid var(--bd);position:sticky;top:0;background:var(--card);z-index:2}
+.dt tbody td{padding:.45rem .75rem;border-bottom:1px solid var(--bd);color:var(--t2)}
+.dt tbody tr:hover td{background:var(--ad);color:var(--t1)}
+.dt .lr td{background:rgba(255,60,172,.05);border-left:3px solid var(--pk)}
+.lt{display:inline-block;background:var(--pk);color:#fff;font-size:.53rem;font-weight:700;padding:.1rem .4rem;border-radius:100px;text-transform:uppercase}
+
+.cli{position:relative;padding:.75rem .9rem;background:var(--elev);border-radius:var(--rs);border-left:3px solid var(--ac);margin-bottom:.5rem}
+.clv{font-weight:700;color:var(--t1);font-size:.85rem;margin-bottom:.05rem}
+.cld{font-size:.65rem;color:var(--t3);margin-bottom:.35rem}
+.clc{font-size:.73rem;color:var(--t2);list-style:none}
+.clc li{margin-bottom:.12rem}.clc li::before{content:'→ ';color:var(--ac);font-weight:700}
+.cldl{font-size:.68rem;color:var(--t3);margin-top:.2rem;padding-left:1rem}
+.cldl .bef{color:var(--rd);text-decoration:line-through}.cldl .aft{color:var(--gn)}
+
+.img-cmp-btn{display:inline-flex;align-items:center;gap:.3rem;margin-top:.35rem;padding:.35rem .7rem;font-family:'Outfit',sans-serif;font-size:.68rem;font-weight:600;background:linear-gradient(135deg,var(--ac),rgba(0,229,255,.5));color:var(--bg);border:none;border-radius:100px;cursor:pointer;transition:.2s}
+.img-cmp-btn:hover{transform:scale(1.03);box-shadow:0 3px 12px var(--ag)}
+.img-cmp-btn i{font-size:.6rem}
+
+/* Time display */
+.tdisp{display:inline-flex;flex-direction:column;gap:0}
+.tdisp .td-date{font-size:inherit;color:inherit}
+.tdisp .td-ago{font-size:.6rem;color:var(--ac);font-weight:600;font-family:'Space Mono',monospace;white-space:nowrap}
+
+/* Modal */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.mo.open{opacity:1;pointer-events:all}
+.mbox{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);max-width:900px;width:95%;max-height:90vh;overflow:hidden;transform:scale(.92);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.mo.open .mbox{transform:scale(1)}
+.mhdr{display:flex;justify-content:space-between;align-items:center;padding:.85rem 1.1rem;border-bottom:1px solid var(--bd)}
+.mhdr h3{font-size:1rem;font-weight:700}
+.mcls{background:0;border:0;color:var(--t2);font-size:1.1rem;cursor:pointer;transition:.2s;padding:.3rem}
+.mcls:hover{color:var(--ac)}
+.mbdy{padding:1.1rem;overflow-y:auto;max-height:calc(90vh - 60px)}
+.cw{position:relative;width:100%;aspect-ratio:16/9;border-radius:var(--rs);overflow:hidden;cursor:col-resize;user-select:none}
+.cw img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover}
+.cw .cb4{clip-path:inset(0 50% 0 0)}.cw .ca4{clip-path:inset(0 0 0 50%)}
+.csl{position:absolute;top:0;bottom:0;left:50%;width:3px;background:var(--ac);z-index:5;pointer-events:none;box-shadow:0 0 8px var(--ag)}
+.csl::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:36px;height:36px;background:var(--ac);border-radius:50%;box-shadow:0 0 16px var(--ag)}
+.csl::after{content:'⇔';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:.8rem;font-weight:900;color:var(--bg);z-index:6}
+.clbs{display:flex;justify-content:space-between;margin-top:.6rem}
+.clb{font-size:.7rem;font-weight:600;padding:.3rem .7rem;border-radius:100px}
+.clb.bf{background:rgba(239,68,68,.15);color:var(--rd)}.clb.af{background:rgba(34,197,94,.15);color:var(--gn)}
+
+/* Creator */
+.crh{position:relative;padding:1.75rem 1.25rem;text-align:center;display:flex;flex-direction:column;align-items:center;overflow:hidden;border-radius:var(--r)}
+.crbn{position:absolute;inset:0;object-fit:cover;width:100%;height:100%;opacity:.22;z-index:0}
+.crov{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(7,7,16,.25),rgba(7,7,16,.95));z-index:1}
+.crh>*:not(.crbn):not(.crov){position:relative;z-index:2}
+.crav{width:80px;height:80px;border-radius:50%;border:3px solid var(--ac);box-shadow:0 0 20px var(--ag);object-fit:cover}
+.crnm{font-size:1.3rem;font-weight:800;margin-top:.7rem}
+.crhd{font-size:.75rem;color:var(--t3);font-family:'Space Mono',monospace}
+.crst{display:flex;gap:1.25rem;margin-top:.6rem;font-size:.78rem;color:var(--t2);flex-wrap:wrap;justify-content:center}
+.crst i{color:var(--ac);margin-right:.25rem}
+.crbio{color:var(--t2);font-size:.8rem;margin-top:.5rem;max-width:460px;line-height:1.5;white-space:pre-wrap}
+.crsc{display:flex;gap:.5rem;margin-top:.7rem}
+.crsc a{width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:var(--elev);border:1px solid var(--bd);border-radius:50%;color:var(--t2);font-size:.8rem;transition:.25s;text-decoration:none}
+.crsc a:hover{color:var(--ac);border-color:var(--ac);transform:translateY(-2px)}
+
+.det-img{width:100%;aspect-ratio:16/8;object-fit:cover;border-radius:var(--r);display:block;margin-bottom:.9rem}
+.det-ttl{font-size:1.5rem;font-weight:900;letter-spacing:-.02em;background:linear-gradient(135deg,var(--ac),#fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.det-id{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--t3);margin-top:.08rem}
+.det-cr{display:flex;align-items:center;gap:.6rem;margin:.7rem 0;cursor:pointer;padding:.4rem;border-radius:var(--rs);transition:.2s}
+.det-cr:hover{background:var(--ad)}
+.det-cr img{width:34px;height:34px;border-radius:50%;border:2px solid var(--bd)}
+.det-cr .dn{font-weight:600;font-size:.8rem}.det-cr .dc{font-size:.65rem;color:var(--t3);font-family:'Space Mono',monospace}
+.det-tl{color:var(--t2);font-size:.8rem;line-height:1.55;margin:.5rem 0 .85rem;white-space:pre-wrap}
+.det-tags{display:flex;flex-wrap:wrap;gap:.25rem;margin-bottom:.85rem}
+.det-tag{font-size:.55rem;padding:.12rem .42rem;background:var(--ad);color:var(--ac);border-radius:100px;font-weight:600;text-transform:uppercase}
+.info-row{display:flex;flex-wrap:wrap;gap:.4rem;margin:.6rem 0}
+.info-chip{font-size:.6rem;padding:.2rem .5rem;background:var(--elev);border:1px solid var(--bd);border-radius:100px;color:var(--t2);display:inline-flex;align-items:center;gap:.25rem}
+.info-chip i{color:var(--ac);font-size:.55rem}
+
+.chw{background:var(--card);border:1px solid var(--bd);border-radius:var(--rs);padding:.85rem;margin-top:.85rem}
+.chw canvas{max-height:200px}
+.cht{font-size:.72rem;font-weight:700;color:var(--t2);margin-bottom:.5rem;display:flex;align-items:center;gap:.3rem}
+.cht i{color:var(--ac);font-size:.65rem}
+
+.sy{max-height:480px;overflow-y:auto}
+.sy::-webkit-scrollbar{width:3px}.sy::-webkit-scrollbar-track{background:0}.sy::-webkit-scrollbar-thumb{background:var(--t3);border-radius:100px}
+
+.stc{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:2rem;text-align:center}
+.sti{font-size:2.2rem;margin-bottom:.6rem}.sti.up{color:var(--ac)}.sti.dwn{color:var(--rd)}
+.stl{font-size:1rem;font-weight:700;margin-bottom:.3rem}.sts{font-size:.73rem;color:var(--t3)}
+
+.lw{display:flex;justify-content:center;align-items:center;padding:3rem 0}
+.ldr{width:32px;height:32px;border:3px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.err{max-width:520px;margin:1.25rem auto;padding:.75rem 1.1rem;background:rgba(255,60,60,.06);border:1px solid rgba(255,60,60,.15);border-radius:var(--rs);color:#ff6b6b;text-align:center;font-weight:500;font-size:.8rem}
+.hidden{display:none!important}
+.sia{opacity:0;transform:translateY(14px);animation:sif .35s ease forwards}
+@keyframes sif{to{opacity:1;transform:translateY(0)}}
+.cup{color:var(--gn)!important}.cdn{color:var(--rd)!important}
+.mmc{cursor:pointer}.mmc img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block}
+.mmc .cb{padding:.6rem .8rem}.mmc .mn{font-size:.78rem}
+
+/* Flash animation for changes */
+@keyframes flash{0%{background:var(--ad)}50%{background:rgba(0,229,255,.15)}100%{background:var(--ad)}}
+.flash{animation:flash .8s ease}
+@keyframes flashCard{0%{box-shadow:0 0 0 0 var(--ag)}50%{box-shadow:0 0 20px 4px var(--ag)}100%{box-shadow:0 0 0 0 var(--ag)}}
+.flash-card{animation:flashCard 1s ease}
+</style>
 </head>
-<body class="antialiased">
-    <div class="container mx-auto p-4 md:p-8">
-        <header class="text-center mb-8">
-            <h1 class="text-4xl md:text-5xl font-extrabold text-white tracking-tight">
-                <i class="fas fa-gamepad text-[#ffc700]"></i> <span class="text-[#ffc700]">Island & Creator</span>
-            </h1>
-            <p class="text-gray-400 mt-2">Search, track, and analyze info for any Fortnite island or creator.</p>
-        </header>
+<body>
+<div class="app">
+<header class="header">
+<div class="logo"><span class="dot"></span>FN Pulse</div>
+<p class="hsub">Real-time Fortnite island analytics & creator insights</p>
+<div class="live-ind"><span class="live-dot"></span>Live · <span id="refreshTimer" class="refresh-timer">Next refresh in --s</span></div>
+</header>
+<nav class="tnav">
+<button class="tb active" data-tab="discovery"><i class="fas fa-compass"></i>Discover</button>
+<button class="tb" data-tab="islands"><i class="fas fa-map"></i>Islands</button>
+<button class="tb" data-tab="creators"><i class="fas fa-user"></i>Creators</button>
+<button class="tb" data-tab="status"><i class="fas fa-signal"></i>Status</button>
+</nav>
+<div id="tab-content">
+<div id="discovery-content" class="pane active">
+<h2 class="stt" style="text-align:center"><span class="ac">Featured</span> Islands</h2>
+<div id="disco-meta" class="dm"></div>
+<div id="disco-maps"></div>
+</div>
+<div id="islands-content" class="pane">
+<div id="isc"><form id="isf" class="srch"><i class="fas fa-search si"></i><input type="text" id="isi" placeholder="Enter island code..." required><button type="submit">Search</button></form></div>
+<div id="isr" class="hidden">
+<button id="bti" class="bk"><i class="fas fa-arrow-left"></i>New Search</button>
+<div class="g2"><div id="md" class="card"></div><div id="mch" class="card"></div><div id="mdh" class="card gf"></div><div id="mmm" class="card gf"></div></div>
+</div>
+</div>
+<div id="creators-content" class="pane">
+<div id="csc"><form id="csf" class="srch"><i class="fas fa-user si"></i><input type="text" id="csi" placeholder="Enter creator code..." required><button type="submit">Search</button></form></div>
+<div id="csr" class="hidden">
+<button id="btc" class="bk"><i class="fas fa-arrow-left"></i>New Search</button>
+<div id="cpp" class="card" style="margin-bottom:1.1rem"></div><div id="cmm"></div>
+</div>
+</div>
+<div id="status-content" class="pane">
+<div id="ss" class="stc"><div class="lw"><div class="ldr"></div></div></div>
+</div>
+</div>
+<div id="loader" class="lw hidden"><div class="ldr"></div></div>
+<div id="error-msg" class="err hidden"></div>
+</div>
 
-        <div class="mb-8 border-b border-gray-700">
-            <nav class="flex -mb-px" aria-label="Tabs">
-                <button class="tab-btn active" data-tab="discovery">Discovery</button>
-                <button class="tab-btn" data-tab="islands">Islands</button>
-                <button class="tab-btn" data-tab="creators">Creators</button>
-                <button class="tab-btn" data-tab="status">Status</button>
-            </nav>
-        </div>
+<div id="cmpModal" class="mo">
+<div class="mbox">
+<div class="mhdr"><h3 id="cmpTitle">Image Compare</h3><button class="mcls" onclick="closeCmp()"><i class="fas fa-times"></i></button></div>
+<div class="mbdy">
+<div class="cw" id="cmpW"><img class="cb4" id="cmpB" src=""><img class="ca4" id="cmpA" src=""><div class="csl" id="cmpS"></div></div>
+<div class="clbs"><span class="clb bf"><i class="fas fa-arrow-left"></i> Before</span><span class="clb af">After <i class="fas fa-arrow-right"></i></span></div>
+</div>
+</div>
+</div>
 
-        <div id="tab-content">
-            <div id="discovery-content" class="tab-pane active">
-                 <div id="discovery-section">
-                    <h2 class="text-3xl font-bold mb-6 text-center text-white">Featured Islands</h2>
-                    <div id="discovery-metadata" class="max-w-4xl mx-auto mb-8"></div>
-                    <div id="discovery-maps" class="space-y-4">
-                        </div>
-                </div>
-            </div>
-            <div id="islands-content" class="tab-pane">
-                 <div id="island-search-container" class="mb-12">
-                    <form id="island-search-form" class="max-w-2xl mx-auto">
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                <i class="fas fa-search text-gray-400"></i>
-                            </div>
-                            <input type="text" id="island-code-input" class="block w-full p-4 pl-10 text-lg text-white border border-gray-600 rounded-lg bg-[#2d2d2d] focus:ring-[#ffc700] focus:border-[#ffc700] placeholder-gray-400" placeholder="Enter island code (Search)" required>
-                            <button type="submit" class="btn-primary absolute right-2.5 bottom-2.5 px-6 py-2 rounded-lg text-lg">Search</button>
-                        </div>
-                    </form>
-                </div>
+<script>
+const API='https://api.fn360.gg/api';
+const DISCO_REFRESH=60000; // 1 min discovery
+const DETAIL_REFRESH=30000; // 30s detail/creator
+const STATUS_REFRESH=120000; // 2 min status
+let mS=new Map(),autoR=null,charts={},lastRefresh=Date.now(),agoIntervalId=null;
 
-                 <div id="island-results-section" class="hidden">
-                    <button id="back-to-island-search" class="btn-primary mb-6 px-4 py-2 rounded-lg"><i class="fas fa-search mr-2"></i>Search Another Island</button>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div id="map-details" class="card rounded-lg p-6"></div>
-                        <div id="map-changelog" class="card rounded-lg p-6"></div>
-                        <div id="map-discovery-history" class="card rounded-lg p-6 lg:col-span-2"></div>
-                        <div id="more-maps" class="card rounded-lg p-6 lg:col-span-2"></div>
-                    </div>
-                </div>
-            </div>
-             <div id="creators-content" class="tab-pane">
-                 <div id="creator-search-container" class="mb-12">
-                    <form id="creator-search-form" class="max-w-2xl mx-auto">
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                <i class="fas fa-user text-gray-400"></i>
-                            </div>
-                            <input type="text" id="creator-code-input" class="block w-full p-4 pl-10 text-lg text-white border border-gray-600 rounded-lg bg-[#2d2d2d] focus:ring-[#ffc700] focus:border-[#ffc700] placeholder-gray-400" placeholder="Enter creator code (e.g., epic)" required>
-                            <button type="submit" class="btn-primary absolute right-2.5 bottom-2.5 px-6 py-2 rounded-lg text-lg">Search</button>
-                        </div>
-                    </form>
-                </div>
-                 <div id="creator-results-section" class="hidden">
-                     <button id="back-to-creator-search" class="btn-primary mb-6 px-4 py-2 rounded-lg"><i class="fas fa-search mr-2"></i>Search Another Creator</button>
-                     <div class="grid grid-cols-1 gap-8">
-                         <div id="creator-profile" class="card rounded-lg p-6"></div>
-                         <div id="creator-maps"></div>
-                     </div>
-                 </div>
-            </div>
-             <div id="status-content" class="tab-pane">
-                <div id="server-status" class="card rounded-lg p-6 mb-8 text-center shadow-lg">Loading server status...</div>
-            </div>
-        </div>
+const $=id=>document.getElementById(id);
 
-        <div id="loader" class="hidden flex justify-center items-center my-16">
-            <div class="loader"></div>
-        </div>
-        <div id="error-message" class="hidden card bg-red-900 border-red-700 text-white text-center p-4 rounded-lg my-8 max-w-2xl mx-auto"></div>
-    </div>
+/* ── Time formatting ── */
+function timeAgo(dateStr){
+if(!dateStr)return'';
+const now=Date.now(),then=new Date(dateStr).getTime(),diff=now-then;
+if(diff<0)return'just now';
+const s=Math.floor(diff/1000),m=Math.floor(s/60),h=Math.floor(m/60),d=Math.floor(h/24),mo=Math.floor(d/30),y=Math.floor(d/365);
+if(s<5)return'just now';
+if(s<60)return s+'s ago';
+if(m<60)return m+'m '+String(s%60).padStart(2,'0')+'s ago';
+if(h<24)return h+'h '+String(m%60).padStart(2,'0')+'m ago';
+if(d<30)return d+'d '+String(h%24).padStart(2,'0')+'h ago';
+if(mo<12)return mo+'mo '+(d%30)+'d ago';
+return y+'y '+(mo%12)+'mo ago';
+}
 
-    <script>
-        const API_BASE_URL = 'https://api.fn360.gg/api';
-        const REFRESH_INTERVAL_MS = 300000; // 5 minutes
-        let currentMapsState = new Map();
-        let autoRefreshInterval = null;
+function fD(s){
+if(!s)return'N/A';
+const d=new Date(s);
+const date=String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();
+const time=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+':'+String(d.getSeconds()).padStart(2,'0');
+return date+' '+time;
+}
 
-        // Element references
-        const serverStatusEl = document.getElementById('server-status');
-        const islandSearchForm = document.getElementById('island-search-form');
-        const islandSearchContainer = document.getElementById('island-search-container');
-        const islandCodeInput = document.getElementById('island-code-input');
-        const creatorSearchForm = document.getElementById('creator-search-form');
-        const creatorSearchContainer = document.getElementById('creator-search-container');
-        const creatorCodeInput = document.getElementById('creator-code-input');
-        const loader = document.getElementById('loader');
-        const errorMessage = document.getElementById('error-message');
-        
-        // Island elements
-        const islandResultsSection = document.getElementById('island-results-section');
-        const discoveryMapsContainer = document.getElementById('discovery-maps');
-        const mapDetailsContainer = document.getElementById('map-details');
-        const mapChangelogContainer = document.getElementById('map-changelog');
-        const mapDiscoveryHistoryContainer = document.getElementById('map-discovery-history');
-        const moreMapsContainer = document.getElementById('more-maps');
-        const backToIslandSearchBtn = document.getElementById('back-to-island-search');
+// Returns HTML with date + live-updating ago
+function fDT(s){
+if(!s)return'N/A';
+return `<span class="tdisp"><span class="td-date">${fD(s)}</span><span class="td-ago" data-ts="${s}">${timeAgo(s)}</span></span>`;
+}
 
-        // Creator elements
-        const creatorResultsSection = document.getElementById('creator-results-section');
-        const creatorProfileContainer = document.getElementById('creator-profile');
-        const creatorMapsContainer = document.getElementById('creator-maps');
-        const backToCreatorSearchBtn = document.getElementById('back-to-creator-search');
+// Update all ago elements every second
+function startAgoUpdater(){
+if(agoIntervalId)clearInterval(agoIntervalId);
+agoIntervalId=setInterval(()=>{
+document.querySelectorAll('.td-ago[data-ts]').forEach(el=>{
+el.textContent=timeAgo(el.dataset.ts);
+});
+// Update refresh timer
+const elapsed=Math.floor((Date.now()-lastRefresh)/1000);
+const next=Math.max(0,Math.floor(DISCO_REFRESH/1000)-elapsed);
+const rt=$('refreshTimer');
+if(rt)rt.textContent=`Next refresh in ${next}s`;
+},1000);
+}
 
-        const tabButtons = document.querySelectorAll('.tab-btn');
-        const tabPanes = document.querySelectorAll('.tab-pane');
-        
-        async function fetchData(endpoint) {
-            try {
-                const response = await fetch(`${API_BASE_URL}${endpoint}`);
-                if (!response.ok) throw new Error(`Network error: ${response.statusText}`);
-                const data = await response.json();
-                if (!data.success) throw new Error(data.message || 'The API failed to return data.');
-                return data;
-            } catch (error) {
-                console.error(`Error fetching from ${endpoint}:`, error);
-                throw error;
-            }
-        }
+function fN(n){if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return(n/1e3).toFixed(1)+'K';return n.toLocaleString()}
+function aC(el,s,e,dur){if(s===e)return;let c=s;const step=Math.max(1,Math.floor(Math.abs(e-s)/(dur/20))),inc=e>s?step:-step,cls=e>s?'cup':'cdn';el.classList.add(cls);const t=setInterval(()=>{c+=inc;if((inc>0&&c>=e)||(inc<0&&c<=e)){c=e;clearInterval(t);setTimeout(()=>el.classList.remove(cls),400)}el.textContent=c.toLocaleString()+' players'},20)}
+function iE(el){el.onerror=null;el.src='https://placehold.co/400x250/0f0f1a/2a2a3a?text=No+Image'}
 
-        async function displayServerStatus() {
-            try {
-                const fullResponse = await fetchData('/external/server_status');
-                const data = fullResponse.data;
-                const statusClass = data.last_valid_status === 'UP' ? 'status-up' : 'status-down';
-                const statusIcon = data.last_valid_status === 'UP' ? 'fa-check-circle' : 'fa-times-circle';
-                serverStatusEl.innerHTML = `
-                    <div class="text-xl mb-4">
-                        <i class="fas ${statusIcon} ${statusClass} mr-2"></i>
-                        Fortnite Server Status: <span class="font-bold ${statusClass}">${data.last_valid_status_message}</span>
-                    </div>
-                    <div class="text-sm text-gray-400 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <div>
-                            <p class="font-semibold text-gray-200">Last Status Check</p>
-                            <p>${formatDate(data.last_valid_status_date)}</p>
-                        </div>
-                        <div>
-                            <p class="font-semibold text-gray-200">API Timestamp</p>
-                            <p>${formatDate(fullResponse.timestamp)}</p>
-                        </div>
-                    </div>
-                `;
-            } catch (error) {
-                serverStatusEl.innerHTML = `<i class="fas fa-exclamation-triangle mr-2"></i> Could not retrieve server status.`;
-                serverStatusEl.classList.add('status-down');
-            }
-        }
-        
-        const animateCount = (element, start, end, duration) => {
-            const range = end - start;
-            if (range === 0) return;
-            let current = start;
-            const increment = end > start ? 1 : -1;
-            const stepTime = Math.abs(Math.floor(duration / Math.abs(range)));
-            
-            const timer = setInterval(() => {
-                current += increment * Math.max(1, Math.floor(Math.abs(range) / (duration / 20)));
-                 if ((increment === 1 && current >= end) || (increment === -1 && current <= end)) {
-                     current = end;
-                     clearInterval(timer);
-                     element.classList.remove('count-up', 'count-down');
-                 }
-                element.textContent = `${current.toLocaleString()} players`;
-            }, 20);
+/* ── Compare modal ── */
+function openCmp(before,after,date){
+$('cmpB').src=before;$('cmpA').src=after;$('cmpTitle').textContent='Image Change — '+fD(date);
+const m=$('cmpModal');m.classList.add('open');
+const w=$('cmpW'),sl=$('cmpS'),bI=$('cmpB'),aI=$('cmpA');let pos=50;
+function sP(p){pos=Math.max(2,Math.min(98,p));bI.style.clipPath=`inset(0 ${100-pos}% 0 0)`;aI.style.clipPath=`inset(0 0 0 ${pos}%)`;sl.style.left=pos+'%'}
+sP(50);
+function onM(e){const r=w.getBoundingClientRect(),x=(e.touches?e.touches[0].clientX:e.clientX)-r.left;sP((x/r.width)*100)}
+function onU(){w.removeEventListener('mousemove',onM);w.removeEventListener('touchmove',onM);document.removeEventListener('mouseup',onU);document.removeEventListener('touchend',onU)}
+w.onmousedown=w.ontouchstart=function(e){e.preventDefault();onM(e);w.addEventListener('mousemove',onM);w.addEventListener('touchmove',onM);document.addEventListener('mouseup',onU);document.addEventListener('touchend',onU)}}
+function closeCmp(){$('cmpModal').classList.remove('open')}
+$('cmpModal').addEventListener('click',e=>{if(e.target===$('cmpModal'))closeCmp()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCmp()});
 
-            const highlightClass = end > start ? 'count-up' : 'count-down';
-            element.classList.add(highlightClass);
-            setTimeout(() => element.classList.remove(highlightClass), duration);
-        };
+/* ── Status ── */
+async function apif(ep){const r=await fetch(`${API}${ep}`);if(!r.ok)throw new Error(r.statusText);const d=await r.json();if(!d.success)throw new Error(d.message||'API error');return d}
+async function showSt(){try{const f=await apif('/external/server_status');const d=f.data,up=d.last_valid_status==='UP';
+$('ss').innerHTML=`<div class="sti ${up?'up':'dwn'}"><i class="fas ${up?'fa-check-circle':'fa-times-circle'}"></i></div><div class="stl">${d.last_valid_status_message}</div><div class="sts">Last check: ${fDT(d.last_valid_status_date)} · API: ${fDT(f.timestamp)}</div>`}catch{$('ss').innerHTML=`<div class="sti dwn"><i class="fas fa-exclamation-triangle"></i></div><div class="stl">Unable to retrieve status</div>`}}
 
+/* ── Discovery ── */
+async function showDisco(upd=false){
+try{const f=await apif('/discovery/surface?date=latest'),data=f.data,nM=new Map(data.maps.map(m=>[m.id+'||'+m.panel,m]));
+lastRefresh=Date.now();
+if(!upd){$('disco-meta').innerHTML=[['Last Discovery',data.last_valid_discovery_date],['End',data.last_valid_discovery_date_end],['Last Browse',data.last_valid_discovery_date_browse],['Browse End',data.last_valid_discovery_date_browse_end],['API',f.timestamp]].map(([l,v])=>`<span class="dmc"><strong>${l}:</strong> ${fDT(v)}</span>`).join('');$('disco-maps').innerHTML=''}
+const panels={};data.maps.forEach(m=>{if(!panels[m.panel])panels[m.panel]=[];panels[m.panel].push(m)});
+const po=data.references?data.references.flat():Object.keys(panels),ppc=data.panels_players_count||{};
+po.forEach(pN=>{if(!panels[pN]||!panels[pN].length)return;panels[pN].sort((a,b)=>a.place-b.place);
+const sid='ps_'+pN.replace(/[^a-zA-Z0-9]/g,'_');let sec=document.getElementById(sid);
+if(!sec){sec=document.createElement('div');sec.id=sid;sec.className='psec';let pc=null;Object.keys(ppc).forEach(k=>{if(k.endsWith(pN)||k===pN)pc=ppc[k]});
+const pretty=pN.replace(/_/g,' ').replace(/([a-z])([A-Z])/g,'$1 $2').trim();
+sec.innerHTML=`<div class="ptr"><span class="pnm">${pretty}</span><span class="pcnt">${panels[pN].length} islands</span>${pc?`<span class="ppl"><i class="fas fa-users" style="margin-right:.2rem"></i>${pc.toLocaleString()} playing</span>`:''}</div><div class="g5 pgr"></div>`;$('disco-maps').appendChild(sec)}
+const grid=sec.querySelector('.pgr'),ex=new Map([...grid.children].map(c=>[c.dataset.uid,c]));
+ex.forEach((card,uid)=>{if(!nM.has(uid)){card.style.opacity='0';card.style.transform='scale(.95)';setTimeout(()=>card.remove(),300)}});
+panels[pN].forEach((map,i)=>{const uid=map.id+'||'+map.panel;const ec=ex.get(uid);
+if(ec){const old=mS.get(uid);if(old&&old.lastSyncCcu!==map.lastSyncCcu){const el=ec.querySelector('.cv');if(el)aC(el,old.lastSyncCcu,map.lastSyncCcu,1000);ec.classList.add('flash-card');setTimeout(()=>ec.classList.remove('flash-card'),1200)}return}
+const cr=map.owner_name||map.owner_code||'Epic Games',code=map.owner_code||'epic';
+const card=document.createElement('div');card.className='card mc sia';card.style.animationDelay=(i*.03)+'s';card.dataset.uid=uid;
+card.innerHTML=`<div class="iw"><img class="mi" src="${map.image_url}" alt="${map.name}" onerror="iE(this)"><span class="pn">#${map.place}</span><div class="ccb"><i class="fas fa-users"></i><span class="cv">${map.lastSyncCcu.toLocaleString()} players</span></div></div><div class="mm"><div class="mn" title="${map.name}">${map.name}</div><div class="mcr">by <span onclick="event.stopPropagation();gC('${code}')">${cr}</span></div><div class="mt"><span class="mtg">${map.state.replace(/_/g,' ')}</span>${map.ratings&&map.ratings.length?map.ratings.slice(0,2).map(r=>`<span class="mtg">${r}</span>`).join(''):''}</div></div>`;
+card.addEventListener('click',()=>location.hash=`#islands?code=${map.id}`);grid.appendChild(card)});
+const cE=sec.querySelector('.pcnt');if(cE)cE.textContent=panels[pN].length+' islands'});
+mS=nM}catch(e){if(!upd)$('disco-maps').innerHTML=`<p style="text-align:center;color:var(--t3)">Could not load. ${e.message}</p>`}}
 
-        async function displayDiscoveryMaps(isUpdate = false) {
-            try {
-                const fullResponse = await fetchData('/discovery/surface?date=latest');
-                const data = fullResponse.data;
-                const newMaps = new Map(data.maps.map(m => [m.id, m]));
+/* ── Island Detail ── */
+function showMD(d){
+const oc=d.owner_code||'epic',nm=d.owner_name||(oc==='epic'?'Epic Games':oc),c=d.creator;
+const sc=d.state==='in_discovery'?'var(--gn)':d.state==='no_discovery'?'var(--rd)':'var(--or)';
+$('md').innerHTML=`<img class="det-img" src="${d.image_url}" alt="${d.name}" onerror="iE(this)"><div class="cb"><div class="det-ttl">${d.name}</div><div class="det-id">${d.id}</div>
+<div class="det-cr" onclick="gC('${oc}')">${c?`<img src="${c.lookup_avatar}" alt="" onerror="iE(this)">`:''}<div><div class="dn">${nm}</div><div class="dc">@${oc}</div></div></div>
+${d.tags&&d.tags.length?`<div class="det-tags">${d.tags.map(t=>`<span class="det-tag">${t}</span>`).join('')}</div>`:''}
+<div class="info-row">
+<span class="info-chip"><i class="fas fa-circle" style="color:${sc};font-size:.4rem"></i>${d.state.replace(/_/g,' ')}</span>
+<span class="info-chip"><i class="fas fa-code-branch"></i>v${d.version}</span>
+${d.type?`<span class="info-chip"><i class="fas fa-cube"></i>${d.type}</span>`:''}
+${d.moderation_status?`<span class="info-chip"><i class="fas fa-shield-alt"></i>${d.moderation_status}</span>`:''}
+${d.discovery_intent?`<span class="info-chip"><i class="fas fa-eye"></i>${d.discovery_intent}</span>`:''}
+${d.locale?`<span class="info-chip"><i class="fas fa-globe"></i>${d.locale}</span>`:''}
+</div>
+<div class="det-tl">${d.tagline||d.introduction||''}</div>
+<div class="g2" style="gap:.5rem">
+<div class="stat"><div class="sl">Max Players</div><div class="sv">${d.max_players||'N/A'}</div></div>
+<div class="stat"><div class="sl">Current Players</div><div class="sv aclr">${(d.lastSyncCcu||0).toLocaleString()}</div></div>
+<div class="stat"><div class="sl">Peak Players</div><div class="sv">${(d.ccu_record||0).toLocaleString()}</div></div>
+<div class="stat"><div class="sl">XP</div><div class="sv" style="color:${d.xp_enabled?'var(--gn)':'var(--rd)'}">${d.xp_enabled?'Enabled':'Disabled'}</div></div>
+</div>
+<div class="g3" style="gap:.5rem;margin-top:.5rem">
+<div class="stat"><div class="sl">Created</div><div class="sv" style="font-size:.65rem">${fDT(d.created)}</div></div>
+<div class="stat"><div class="sl">Published</div><div class="sv" style="font-size:.65rem">${fDT(d.published)}</div></div>
+<div class="stat"><div class="sl">Last Sync</div><div class="sv" style="font-size:.65rem">${fDT(d.lastSyncDate)}</div></div>
+</div>
+${d.minutes_played?`<div class="g2" style="gap:.5rem;margin-top:.5rem"><div class="stat"><div class="sl">Minutes Played</div><div class="sv">${fN(d.minutes_played)}</div></div><div class="stat"><div class="sl">Peak Date</div><div class="sv" style="font-size:.65rem">${fDT(d.ccu_record_date)}</div></div></div>`:''}
+${d.metrics_updated_date?`<div class="stat" style="margin-top:.5rem"><div class="sl">Metrics Updated</div><div class="sv" style="font-size:.65rem">${fDT(d.metrics_updated_date)}</div></div>`:''}
+${d.lobby_background_image_url?`<div style="margin-top:.7rem"><div class="sl" style="margin-bottom:.3rem">LOBBY BACKGROUND</div><img src="${d.lobby_background_image_url}" style="width:100%;border-radius:var(--rs);aspect-ratio:16/9;object-fit:cover" onerror="this.style.display='none'"></div>`:''}
+</div>`}
 
-                if (!isUpdate) {
-                     const timestamp = fullResponse.timestamp;
-                     document.getElementById('discovery-metadata').innerHTML = `
-                        <div class="card p-4 rounded-lg text-xs text-gray-400 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 text-center">
-                            <div><p class="font-bold text-gray-200">Last Discovery</p><p>${formatDate(data.last_valid_discovery_date)}</p></div>
-                            <div><p class="font-bold text-gray-200">Discovery End</p><p>${formatDate(data.last_valid_discovery_date_end)}</p></div>
-                            <div><p class="font-bold text-gray-200">Last Browse</p><p>${formatDate(data.last_valid_discovery_date_browse)}</p></div>
-                            <div><p class="font-bold text-gray-200">Browse End</p><p>${formatDate(data.last_valid_discovery_date_browse_end)}</p></div>
-                            <div class="col-span-2 sm:col-span-1 md:col-span-1"><p class="font-bold text-gray-200">API Timestamp</p><p>${formatDate(timestamp)}</p></div>
-                        </div>`;
-                     discoveryMapsContainer.innerHTML = '';
-                }
+function showCL(cl){
+let h=`<div class="cb"><h3 class="stt"><span class="ac">Change</span>log</h3>`;
+if(!cl.length)h+='<p style="color:var(--t3)">No changelog.</p>';
+else{h+='<div class="sy">';cl.slice(0,25).forEach(item=>{
+const changes=Object.entries(item.metadata).map(([k,v])=>{
+let det='',imgBtn='';
+if(v&&typeof v==='object'&&'before' in v&&'after' in v){
+if(k==='image_url'){imgBtn=`<button class="img-cmp-btn" onclick="event.stopPropagation();openCmp('${v.before}','${v.after}','${item.date}')"><i class="fas fa-images"></i>Compare Images</button>`;det=`<div class="cldl">Image was updated</div>`}
+else{const b=Array.isArray(v.before)?v.before.join(', '):String(v.before),a=Array.isArray(v.after)?v.after.join(', '):String(v.after);
+if(b.length<120&&a.length<120)det=`<div class="cldl"><span class="bef">${b}</span> → <span class="aft">${a}</span></div>`}}
+return `<li>${k.replace(/_/g,' ')}${det}${imgBtn}</li>`}).join('');
+h+=`<div class="cli"><div class="clv">Version ${item.metadata.version?.after||'Update'}</div><div class="cld">${fDT(item.date)}</div><ul class="clc">${changes}</ul></div>`});h+='</div>'}
+h+='</div>';$('mch').innerHTML=h}
 
-                const panels = {};
-                data.maps.forEach(map => {
-                    if (!panels[map.panel]) panels[map.panel] = [];
-                    panels[map.panel].push(map);
-                });
+function showDH(hist){
+let h=`<div class="cb"><h3 class="stt"><span class="ac">Discovery</span> History</h3>`;
+if(!hist||!hist.length){h+='<p style="color:var(--t3)">No history.</p></div>';$('mdh').innerHTML=h;return}
+const now=new Date();hist.sort((a,b)=>new Date(b.from)-new Date(a.from));
+const pM={};hist.forEach(it=>{const p=it.panel.replace(/_/g,' ');pM[p]=(pM[p]||0)+it.minutes});
+const cE=Object.entries(pM).sort((a,b)=>b[1]-a[1]).slice(0,10);
+h+=`<div class="chw"><div class="cht"><i class="fas fa-chart-bar"></i>Minutes in Discovery by Panel</div><canvas id="dhC1"></canvas></div>`;
+const dM={};hist.forEach(it=>{const day=new Date(it.from).toISOString().slice(0,10);dM[day]=(dM[day]||0)+1});
+const dE=Object.entries(dM).sort((a,b)=>a[0].localeCompare(b[0])).slice(-30);
+h+=`<div class="chw" style="margin-top:.6rem"><div class="cht"><i class="fas fa-chart-line"></i>Appearances (last 30 days)</div><canvas id="dhC2"></canvas></div>`;
+h+=`<div class="sy" style="margin-top:.75rem"><table class="dt"><thead><tr><th>Status</th><th>Panel</th><th>Place</th><th>From</th><th>To</th><th>Mins</th></tr></thead><tbody>`;
+hist.slice(0,50).forEach(it=>{const live=now>=new Date(it.from)&&now<=new Date(it.to);
+h+=`<tr class="${live?'lr':''}"><td>${live?'<span class="lt">LIVE</span>':''}</td><td style="color:var(--t1)">${it.panel.replace(/_/g,' ')}</td><td>#${it.place}</td><td>${fDT(it.from)}</td><td>${fDT(it.to)}</td><td>${it.minutes}</td></tr>`});
+h+='</tbody></table></div></div>';$('mdh').innerHTML=h;
+setTimeout(()=>{
+const cls=['#00e5ff','#ff3cac','#22c55e','#f59e0b','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#6366f1'];
+if(charts.c1)charts.c1.destroy();const x1=document.getElementById('dhC1');
+if(x1)charts.c1=new Chart(x1,{type:'bar',data:{labels:cE.map(e=>e[0].length>18?e[0].slice(0,18)+'…':e[0]),datasets:[{data:cE.map(e=>e[1]),backgroundColor:cE.map((_,i)=>cls[i%cls.length]+'99'),borderColor:cE.map((_,i)=>cls[i%cls.length]),borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#44445a',font:{size:9}},grid:{display:false}},y:{ticks:{color:'#44445a',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}}}});
+if(charts.c2)charts.c2.destroy();const x2=document.getElementById('dhC2');
+if(x2)charts.c2=new Chart(x2,{type:'line',data:{labels:dE.map(e=>e[0].slice(5)),datasets:[{data:dE.map(e=>e[1]),borderColor:'#00e5ff',backgroundColor:'rgba(0,229,255,.1)',fill:true,tension:.4,pointRadius:2,pointBackgroundColor:'#00e5ff',borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#44445a',font:{size:9}},grid:{display:false}},y:{ticks:{color:'#44445a',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}}}}})},100)}
 
-                const panelOrder = data.references ? data.references.flat() : Object.keys(panels);
+function showMM(maps,ct){
+let h=`<div class="cb"><h3 class="stt">More by <span class="ac">Creator</span></h3>`;
+if(!maps.length)h+='<p style="color:var(--t3)">No other maps.</p>';
+else{h+='<div class="g4">';maps.forEach(m=>{h+=`<div class="card mmc" onclick="location.hash='#islands?code=${m.id}'"><div class="iw"><img class="mi" src="${m.image_url}" alt="${m.name}" onerror="iE(this)"><div class="ccb"><i class="fas fa-users"></i>${(m.lastSyncCcu||0).toLocaleString()}</div></div><div class="cb"><div class="mn" title="${m.name}">${m.name}</div></div></div>`});h+='</div>'}
+h+='</div>';ct.innerHTML=h}
 
-                panelOrder.forEach((panelName, index) => {
-                    if (!panels[panelName] || panels[panelName].length === 0) return;
-                    panels[panelName].sort((a, b) => a.place - b.place);
+/* ── Creator ── */
+function showCP(c){const hb=c.lookup_banner&&c.lookup_banner.length>5;
+$('cpp').innerHTML=`<div class="crh">${hb?`<img class="crbn" src="${c.lookup_banner}" alt="" onerror="this.style.display='none'">`:''}<div class="crov"></div>
+<img class="crav" src="${c.lookup_avatar}" alt="${c.name}" onerror="iE(this)">
+<div class="crnm">${c.name}</div><div class="crhd">@${c.id}</div>
+<div class="crst"><span><i class="fas fa-users"></i>${c.lookup_follower_count.toLocaleString()} followers</span>${c.last_sync_ccu!=null?`<span><i class="fas fa-gamepad"></i>${c.last_sync_ccu.toLocaleString()} playing</span>`:''}${c.last_sync_position?`<span><i class="fas fa-trophy"></i>#${c.last_sync_position} rank</span>`:''}${c.last_sync_minutes_played?`<span><i class="fas fa-clock"></i>${fN(Math.round(c.last_sync_minutes_played/60))}h total</span>`:''}${c.last_sync_minutes_played_position?`<span><i class="fas fa-chart-line"></i>#${c.last_sync_minutes_played_position} playtime rank</span>`:''}</div>
+${c.lookup_bio?`<div class="crbio">${c.lookup_bio}</div>`:''}
+<div class="crsc">${c.lookup_socials_twitter?`<a href="https://twitter.com/${c.lookup_socials_twitter}" target="_blank"><i class="fab fa-twitter"></i></a>`:''}${c.lookup_socials_youtube?`<a href="https://youtube.com/${c.lookup_socials_youtube}" target="_blank"><i class="fab fa-youtube"></i></a>`:''}${c.lookup_socials_discord?`<a href="https://discord.gg/${c.lookup_socials_discord}" target="_blank"><i class="fab fa-discord"></i></a>`:''}</div></div>`}
 
-                    let panelWrapper = document.getElementById(`panel-${panelName}`);
-                    if (!panelWrapper) {
-                        panelWrapper = document.createElement('div');
-                        panelWrapper.id = `panel-${panelName}`;
-                        const panelHeader = document.createElement('button');
-                        panelHeader.className = 'panel-header w-full text-left';
-                        panelHeader.innerHTML = `<h3 class="text-2xl font-bold text-[#ffc700]">${panelName.replace(/_/g, ' ')}</h3><i class="fas fa-chevron-down panel-icon"></i>`;
-                        
-                        const panelContent = document.createElement('div');
-                        panelContent.className = 'panel-content';
-                        const gridContainer = document.createElement('div');
-                        gridContainer.className = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pt-6';
-                        panelContent.appendChild(gridContainer);
-                        panelWrapper.appendChild(panelHeader);
-                        panelWrapper.appendChild(panelContent);
-                        discoveryMapsContainer.appendChild(panelWrapper);
+function showCM(maps){
+let h=`<h2 class="stt" style="text-align:center;margin-top:.85rem"><span class="ac">Creator's</span> Maps (${maps.length})</h2>`;
+if(!maps.length){h+='<p style="text-align:center;color:var(--t3)">No public maps.</p>';$('cmm').innerHTML=h;return}
+const tC=maps.reduce((s,m)=>s+(m.lastSyncCcu||0),0),tM=maps.reduce((s,m)=>s+(m.minutes_played||0),0),pk=maps.reduce((b,m)=>(m.ccu_record||0)>(b.ccu_record||0)?m:b,maps[0]);
+h+=`<div class="g4" style="margin-bottom:1rem"><div class="stat"><div class="sl">Total Maps</div><div class="sv aclr">${maps.length}</div></div><div class="stat"><div class="sl">Total CCU</div><div class="sv">${tC.toLocaleString()}</div></div><div class="stat"><div class="sl">Total Playtime</div><div class="sv">${fN(tM)}m</div></div><div class="stat"><div class="sl">Top Peak</div><div class="sv">${fN(pk.ccu_record||0)}</div></div></div>`;
+const top10=maps.slice().sort((a,b)=>(b.lastSyncCcu||0)-(a.lastSyncCcu||0)).slice(0,10);
+h+=`<div class="chw" style="margin-bottom:1rem"><div class="cht"><i class="fas fa-chart-bar"></i>Current Players — Top Maps</div><canvas id="crCC"></canvas></div>`;
+maps.sort((a,b)=>(b.lastSyncCcu||0)-(a.lastSyncCcu||0));
+h+='<div class="g5">';maps.forEach((m,i)=>{
+const sc2=m.state==='in_discovery'?'var(--gn)':m.state==='no_discovery'?'var(--rd)':'var(--or)';
+h+=`<div class="card mc sia" style="animation-delay:${i*.025}s" onclick="location.hash='#islands?code=${m.id}'"><div class="iw"><img class="mi" src="${m.image_url}" alt="${m.name}" onerror="iE(this)"><div class="ccb"><i class="fas fa-users"></i>${(m.lastSyncCcu||0).toLocaleString()}</div></div><div class="mm"><div class="mn" title="${m.name}">${m.name}</div><div class="mcr">${m.id}</div><div class="mt"><span class="mtg" style="background:${sc2}22;color:${sc2}">${m.state.replace(/_/g,' ')}</span>${m.type?`<span class="mtg">${m.type}</span>`:''}</div></div></div>`});
+h+='</div>';$('cmm').innerHTML=h;
+setTimeout(()=>{if(charts.crC)charts.crC.destroy();const ctx=document.getElementById('crCC');
+if(ctx){const cls=['#00e5ff','#ff3cac','#22c55e','#f59e0b','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#6366f1'];
+charts.crC=new Chart(ctx,{type:'bar',data:{labels:top10.map(m=>m.name.length>16?m.name.slice(0,16)+'…':m.name),datasets:[{data:top10.map(m=>m.lastSyncCcu||0),backgroundColor:top10.map((_,i)=>cls[i%cls.length]+'99'),borderColor:top10.map((_,i)=>cls[i%cls.length]),borderWidth:1,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#44445a',font:{size:9}},grid:{color:'rgba(255,255,255,.04)'}},y:{ticks:{color:'#7a7a90',font:{size:9}},grid:{display:false}}}}})}},100)}
 
-                          panelHeader.addEventListener('click', () => {
-                              const content = panelHeader.nextElementSibling;
-                              if(panelHeader.classList.contains('active')) {
-                                  panelHeader.classList.remove('active');
-                                  content.style.maxHeight = null;
-                              } else {
-                                  document.querySelectorAll('.panel-header.active').forEach(activeHeader => {
-                                      activeHeader.classList.remove('active');
-                                      activeHeader.nextElementSibling.style.maxHeight = null;
-                                  });
-                                  panelHeader.classList.add('active');
-                                  content.style.maxHeight = content.scrollHeight + "px";
-                              }
-                          });
-                    }
+function gC(code){if(code)location.hash=`#creators?name=${code}`}
 
-                    const gridContainer = panelWrapper.querySelector('.grid');
-                    const existingCards = new Map([...gridContainer.children].map(c => [c.dataset.mapId, c]));
+function sL(on,tab){$('loader').classList.toggle('hidden',!on);if(on){$('error-msg').classList.add('hidden');if(tab==='islands'){$('isr').classList.add('hidden');$('isc').classList.add('hidden')}else if(tab==='creators'){$('csr').classList.add('hidden');$('csc').classList.add('hidden')}}}
+function sE(msg,tab){$('error-msg').textContent=msg;$('error-msg').classList.remove('hidden');if(tab==='islands'){$('isc').classList.remove('hidden');$('isr').classList.add('hidden')}else if(tab==='creators'){$('csc').classList.remove('hidden');$('csr').classList.add('hidden')}}
 
-                    // Update existing, remove old
-                    existingCards.forEach((card, mapId) => {
-                        const newMapData = newMaps.get(mapId);
-                        if(newMapData && newMapData.panel === panelName) {
-                            const oldMapData = currentMapsState.get(mapId);
-                            if(oldMapData && oldMapData.lastSyncCcu !== newMapData.lastSyncCcu) {
-                                const ccuEl = card.querySelector('.ccu-value');
-                                if (ccuEl) {
-                                    animateCount(ccuEl, oldMapData.lastSyncCcu, newMapData.lastSyncCcu, 1000);
-                                }
-                            }
-                        } else {
-                            card.classList.add('fade-out');
-                            setTimeout(() => card.remove(), 500);
-                        }
-                    });
+async function sI(code,upd=false){
+if(!upd)sL(true,'islands');
+try{const det=await apif(`/maps/${code}`);showMD(det.data);if(!upd)$('isr').classList.remove('hidden');
+const cid=det.data.creator?.id||det.data.owner_code;
+const[cl,disc,more]=await Promise.allSettled([apif(`/maps/${code}/changelog`),apif(`/maps/${code}/discovery`),cid?apif(`/creators/${cid}/maps/more?map_id=${code}&limit=4`):Promise.reject()]);
+cl.status==='fulfilled'?showCL(cl.value.data):($('mch').innerHTML=`<div class="cb"><h3 class="stt"><span class="ac">Change</span>log</h3><p style="color:var(--t3)">Could not load.</p></div>`);
+disc.status==='fulfilled'?showDH(disc.value.data.results):($('mdh').innerHTML=`<div class="cb"><h3 class="stt"><span class="ac">Discovery</span> History</h3><p style="color:var(--t3)">Could not load.</p></div>`);
+more.status==='fulfilled'?showMM(more.value.data,$('mmm')):($('mmm').innerHTML=`<div class="cb"><h3 class="stt">More by <span class="ac">Creator</span></h3><p style="color:var(--t3)">Could not load.</p></div>`);
+if(!upd){if(autoR)clearInterval(autoR);autoR=setInterval(()=>sI(code,true),DETAIL_REFRESH)}}
+catch{if(!upd)sE(`Island "${code}" not found.`,'islands')}finally{if(!upd)sL(false,'islands')}}
 
-                    // Add new
-                    panels[panelName].forEach(map => {
-                          if(!existingCards.has(map.id)) {
-                              let creatorName = map.owner_name || map.owner_code;
-                              let creatorCode = map.owner_code;
-                              
-                              if (!creatorCode) { // Catches null, undefined, or empty string for Epic Games maps
-                                  creatorName = 'Epic Games';
-                                  creatorCode = 'epic'; // Use a default code for the link to work
-                              }
+async function sCA(code,upd=false){
+code=code.toLowerCase();if(!upd)sL(true,'creators');
+try{const[p,m]=await Promise.all([apif(`/creators/${code}`),apif(`/creators/${code}/maps/all`)]);showCP(p.data);showCM(m.data);
+if(!upd)$('csr').classList.remove('hidden');if(!upd){if(autoR)clearInterval(autoR);autoR=setInterval(()=>sCA(code,true),DETAIL_REFRESH)}}
+catch{if(!upd)sE(`Creator "${code}" not found.`,'creators')}finally{if(!upd)sL(false,'creators')}}
 
-                              const card = document.createElement('div');
-                              card.className = 'card rounded-lg overflow-hidden cursor-pointer flex flex-col fade-in';
-                              card.dataset.mapId = map.id;
-                              card.innerHTML = `
-                                  <img src="${map.image_url}" alt="${map.name}" class="w-full h-40 object-cover" onerror="this.onerror=null;this.src='https.placehold.co/400x200/1e1e1e/e0e0e0?text=No+Image';">
-                                  <div class="p-4 flex-grow flex flex-col">
-                                      <h3 class="font-bold text-lg truncate" title="${map.name}">${map.name}</h3>
-                                      <p class="text-gray-400 text-sm mb-2">by <span class="text-white hover:text-[#ffc700] cursor-pointer" onclick="event.stopPropagation(); searchCreator('${creatorCode}')">${creatorName}</span></p>
-                                      <div class="flex items-center text-gray-300">
-                                          <i class="fas fa-users mr-2"></i>
-                                          <span class="ccu-value">${map.lastSyncCcu.toLocaleString()} players</span>
-                                      </div>
-                                      <div class="mt-3 pt-3 border-t border-gray-600 text-xs text-gray-400 space-y-1 flex-grow">
-                                          <div class="flex justify-between"><span>Place:</span> <span class="font-semibold text-gray-200">#${map.place}</span></div>
-                                          <div class="flex justify-between"><span>State:</span> <span class="font-semibold text-gray-200 capitalize">${map.state.replace('_', ' ')}</span></div>
-                                          <div class="flex justify-between"><span>Unlisted:</span> <span class="font-semibold ${map.unlisted ? 'text-red-400' : 'text-green-400'}">${map.unlisted ? 'Yes' : 'No'}</span></div>
-                                          <div class="truncate mt-1" title="${map.ratings.join(', ')}">
-                                              <span class="font-semibold">Ratings:</span> ${map.ratings.join(', ') || 'N/A'}
-                                          </div>
-                                      </div>
-                                  </div>`;
-                              card.addEventListener('click', (e) => {
-                                  e.preventDefault();
-                                  location.hash = `#islands?code=${map.id}`;
-                              });
-                              gridContainer.appendChild(card);
-                          }
-                    });
-                });
-                 if (!isUpdate) {
-                     const firstPanel = document.querySelector('.panel-header');
-                     if(firstPanel) {
-                         firstPanel.classList.add('active');
-                         firstPanel.nextElementSibling.style.maxHeight = firstPanel.nextElementSibling.scrollHeight + "px";
-                     }
-                 }
-                currentMapsState = newMaps;
-            } catch (error) {
-                 if(!isUpdate) discoveryMapsContainer.innerHTML = `<p class="text-center col-span-full">Could not load featured islands. ${error.message}</p>`;
-            }
-        }
-        
-        function formatDate(dateString) {
-            if (!dateString) return 'N/A';
-            const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric'}) + ' ' + date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-        }
+function hU(){if(autoR){clearInterval(autoR);autoR=null}
+const hash=location.hash.slice(1)||'discovery',[path,query]=hash.split('?');
+document.querySelectorAll('.tb').forEach(b=>b.classList.toggle('active',b.dataset.tab===path));
+document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('active',p.id===`${path}-content`));
+$('error-msg').classList.add('hidden');$('isr').classList.add('hidden');$('isc').classList.remove('hidden');$('isi').value='';$('csr').classList.add('hidden');$('csc').classList.remove('hidden');$('csi').value='';
+if(query){const p=new URLSearchParams(query);
+if(path==='islands'&&p.has('code')){$('isi').value=p.get('code');sI(p.get('code'))}
+else if(path==='creators'&&p.has('name')){$('csi').value=p.get('name');sCA(p.get('name'))}}}
 
-        function displayMapDetails(details) {
-            const creator = details.creator;
-            const ownerCode = details.owner_code || 'epic';
-            let creatorName = details.owner_name || (ownerCode.toLowerCase().includes('epic') ? 'Epic Games' : ownerCode);
-        
-            mapDetailsContainer.innerHTML = `
-                <img src="${details.image_url}" alt="${details.name}" class="w-full rounded-lg mb-4" onerror="this.onerror=null;this.src='https.placehold.co/600x300/1e1e1e/e0e0e0?text=No+Image';">
-                <h2 class="text-3xl font-extrabold text-[#ffc700]">${details.name}</h2>
-                <p class="text-gray-400 text-lg mb-4">${details.id}</p>
-                
-                 <div class="flex items-center mb-4 cursor-pointer" onclick="searchCreator('${ownerCode}')">
-                     ${creator ? `<img src="${creator.lookup_avatar}" alt="${creator.name}" class="w-12 h-12 rounded-full mr-3" onerror="this.onerror=null;this.src='https.placehold.co/48x48/1e1e1e/e0e0e0?text=N/A';">` : ''}
-                     <div>
-                         <p class="font-semibold text-white hover:text-[#ffc700]">${creatorName}</p>
-                         <p class="text-sm text-gray-400">@${ownerCode}</p>
-                     </div>
-                 </div>
+$('isf').addEventListener('submit',e=>{e.preventDefault();const v=$('isi').value.trim();if(v)location.hash=`#islands?code=${v}`});
+$('csf').addEventListener('submit',e=>{e.preventDefault();const v=$('csi').value.trim();if(v)location.hash=`#creators?name=${v}`});
+$('bti').addEventListener('click',()=>{location.hash='#islands';if(location.hash==='#islands')hU()});
+$('btc').addEventListener('click',()=>{location.hash='#creators';if(location.hash==='#creators')hU()});
+document.querySelectorAll('.tb').forEach(b=>b.addEventListener('click',e=>{const t=e.currentTarget.dataset.tab;if(location.hash.split('?')[0]!==`#${t}`)location.hash=`#${t}`}));
+window.addEventListener('hashchange',hU);
 
-                <p class="text-gray-300 mb-4 whitespace-pre-wrap">${details.tagline}</p>
-
-                <div class="grid grid-cols-2 gap-4 text-sm">
-                    <div class="card p-3 rounded-md"><p class="text-gray-400">Max Players</p><p class="font-bold text-white text-lg">${details.max_players || 'N/A'}</p></div>
-                    <div class="card p-3 rounded-md"><p class="text-gray-400">Current Players</p><p class="font-bold text-white text-lg">${(details.lastSyncCcu || 0).toLocaleString()}</p></div>
-                    <div class="card p-3 rounded-md"><p class="text-gray-400">Peak Players</p><p class="font-bold text-white text-lg">${(details.ccu_record || 0).toLocaleString()}</p></div>
-                    <div class="card p-3 rounded-md"><p class="text-gray-400">XP Enabled</p><p class="font-bold text-lg ${details.xp_enabled ? 'text-green-400' : 'text-red-400'}">${details.xp_enabled ? 'Yes' : 'No'}</p></div>
-                </div>
-                 <div class="mt-4 card p-3 rounded-md"><p class="text-gray-400">Created</p><p class="font-bold text-white">${formatDate(details.created)}</p></div>
-                 <div class="mt-4 card p-3 rounded-md"><p class="text-gray-400">Last Published</p><p class="font-bold text-white">${formatDate(details.published)} (v${details.version})</p></div>
-            `;
-        }
-        
-        function displayMapChangelog(changelog) {
-              let content = '<h2 class="text-2xl font-bold mb-4 text-[#ffc700]">Changelog</h2>';
-              if (changelog.length === 0) {
-                  content += '<p>No changelog found for this island.</p>';
-              } else {
-                  content += '<ul class="space-y-4 max-h-[600px] overflow-y-auto">';
-                  changelog.slice(0, 15).forEach(item => {
-                      const changes = Object.entries(item.metadata).map(([key, value]) => `<li><span class="font-semibold text-gray-300 capitalize">${key.replace(/_/g, ' ')}:</span> changed.</li>`).join('');
-                      content += `
-                          <li class="card p-4 rounded-md border-l-4 border-[#ffc700]">
-                              <p class="font-semibold text-white">Version ${item.metadata.version?.after || 'Update'}</p>
-                              <p class="text-sm text-gray-400 mb-2">${formatDate(item.date)}</p>
-                              <ul class="list-disc pl-5 text-gray-300 text-sm">${changes}</ul>
-                          </li>`;
-                  });
-                  content += '</ul>';
-              }
-              mapChangelogContainer.innerHTML = content;
-        }
-
-        function displayDiscoveryHistory(history) {
-            let content = '<h2 class="text-2xl font-bold mb-4 text-[#ffc700]">Discovery History</h2>';
-            if (!history || history.length === 0) {
-                content += '<p>No discovery history found for this island.</p>';
-            } else {
-                const now = new Date();
-                history.sort((a, b) => new Date(b.from) - new Date(a.from));
-                 content += `<div class="max-h-[400px] overflow-y-auto"><table class="w-full text-sm text-left text-gray-400">
-                    <thead class="text-xs text-gray-300 uppercase bg-gray-700 sticky top-0">
-                        <tr>
-                            <th scope="col" class="px-4 py-3">Status</th>
-                            <th scope="col" class="px-4 py-3">Panel</th>
-                            <th scope="col" class="px-4 py-3">Place</th>
-                            <th scope="col" class="px-4 py-3">From</th>
-                            <th scope="col" class="px-4 py-3">To</th>
-                            <th scope="col" class="px-4 py-3">Duration (Mins)</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
-                history.slice(0, 50).forEach(item => {
-                    const fromDate = new Date(item.from);
-                    const toDate = new Date(item.to);
-                    const isLive = now >= fromDate && now <= toDate;
-                    content += `
-                        <tr class="${isLive ? 'live-row' : 'border-b border-gray-700'}">
-                             <td class="px-4 py-3">${isLive ? `<span class="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">LIVE #${item.place}</span>` : ''}</td>
-                            <td class="px-4 py-3 font-medium text-white truncate" title="${item.panel}">${item.panel.replace(/_/g, ' ')}</td>
-                            <td class="px-4 py-3">#${item.place}</td>
-                            <td class="px-4 py-3">${formatDate(item.from)}</td>
-                            <td class="px-4 py-3">${formatDate(item.to)}</td>
-                            <td class="px-4 py-3">${item.minutes}</td>
-                        </tr>`;
-                });
-                content += '</tbody></table></div>';
-            }
-            mapDiscoveryHistoryContainer.innerHTML = content;
-        }
-
-        function displayMoreMaps(maps, container) {
-              let content = `<h2 class="text-2xl font-bold mb-4 text-[#ffc700]">More Maps by this Creator</h2>`;
-              if(maps.length === 0) {
-                  content += '<p>No other maps found for this creator.</p>';
-              } else {
-                  content += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">`;
-                  maps.forEach(map => {
-                      content += `
-                          <div class="card rounded-lg overflow-hidden cursor-pointer" onclick="location.hash = '#islands?code=${map.id}'">
-                              <img src="${map.image_url}" alt="${map.name}" class="w-full h-32 object-cover" onerror="this.onerror=null;this.src='https.placehold.co/400x200/1e1e1e/e0e0e0?text=No+Image';">
-                              <div class="p-3">
-                                  <h4 class="font-bold truncate" title="${map.name}">${map.name}</h4>
-                              </div>
-                          </div>`;
-                  });
-                  content += `</div>`;
-              }
-              container.innerHTML = content;
-        }
-
-        function displayCreatorProfile(creator) {
-            creatorProfileContainer.innerHTML = `
-                <h2 class="text-2xl font-bold mb-4 text-[#ffc700]">Creator Profile</h2>
-                <div class="flex flex-col items-center">
-                    <img src="${creator.lookup_avatar}" alt="${creator.name}" class="w-32 h-32 rounded-full mb-4 border-4 border-[#ffc700]" onerror="this.onerror=null;this.src='https.placehold.co/128x128/1e1e1e/e0e0e0?text=N/A';">
-                    <h3 class="text-2xl font-bold text-white">${creator.name}</h3>
-                    <p class="text-gray-400">@${creator.id}</p>
-                     <p class="text-gray-300 mt-2"><i class="fas fa-users mr-2"></i>${creator.lookup_follower_count.toLocaleString()} Followers</p>
-                    <p class="text-center mt-4 text-gray-300">${creator.lookup_bio || ''}</p>
-                    <div class="flex space-x-4 mt-4">
-                        ${creator.lookup_socials_twitter ? `<a href="https://twitter.com/${creator.lookup_socials_twitter}" target="_blank" class="text-gray-400 hover:text-[#ffc700]"><i class="fab fa-twitter fa-2x"></i></a>` : ''}
-                        ${creator.lookup_socials_youtube ? `<a href="https://youtube.com/${creator.lookup_socials_youtube}" target="_blank" class="text-gray-400 hover:text-[#ffc700]"><i class="fab fa-youtube fa-2x"></i></a>` : ''}
-                    </div>
-                </div>
-            `;
-        }
-
-        function displayCreatorMaps(maps) {
-            let content = `<h2 class="text-3xl font-bold mt-8 mb-6 text-center text-white">Creator's Maps</h2>`;
-            if (maps.length === 0) {
-                content += '<p class="text-center">This creator has no public maps.</p>';
-            } else {
-                content += `<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">`;
-                maps.forEach(map => {
-                    content += `
-                        <div class="card rounded-lg overflow-hidden cursor-pointer flex flex-col" onclick="location.hash = '#islands?code=${map.id}'">
-                            <img src="${map.image_url}" alt="${map.name}" class="w-full h-40 object-cover" onerror="this.onerror=null;this.src='https.placehold.co/400x200/1e1e1e/e0e0e0?text=No+Image';">
-                            <div class="p-4 flex-grow flex flex-col">
-                                <h3 class="font-bold text-lg truncate" title="${map.name}">${map.name}</h3>
-                                <p class="text-gray-400 text-sm mb-2">${map.id}</p>
-                                <div class="flex items-center text-gray-300">
-                                    <i class="fas fa-users mr-2"></i>
-                                    <span>${(map.lastSyncCcu || 0).toLocaleString()} players</span>
-                                </div>
-                            </div>
-                        </div>`;
-                });
-                content += '</div>';
-            }
-            creatorMapsContainer.innerHTML = content;
-        }
-        
-        function searchCreator(creatorCode) {
-            if (!creatorCode) return;
-            location.hash = `#creators?name=${creatorCode}`;
-        }
-
-        function showLoading(isLoading, tab) {
-            loader.classList.toggle('hidden', !isLoading);
-            if (isLoading) {
-                errorMessage.classList.add('hidden');
-                if (tab === 'islands') {
-                    islandResultsSection.classList.add('hidden');
-                    islandSearchContainer.classList.add('hidden');
-                } else if (tab === 'creators') {
-                    creatorResultsSection.classList.add('hidden');
-                    creatorSearchContainer.classList.add('hidden');
-                }
-            }
-        }
-        
-        function showError(message, tab) {
-            errorMessage.textContent = message;
-            errorMessage.classList.remove('hidden');
-            if (tab === 'islands') {
-                islandSearchContainer.classList.remove('hidden');
-                islandResultsSection.classList.add('hidden');
-            } else if (tab === 'creators') {
-                creatorSearchContainer.classList.remove('hidden');
-                creatorResultsSection.classList.add('hidden');
-            }
-        }
-
-        async function searchIsland(islandCode, isUpdate = false) {
-            if (!isUpdate) {
-                showLoading(true, 'islands');
-            }
-            try {
-                const detailsResponse = await fetchData(`/maps/${islandCode}`);
-                displayMapDetails(detailsResponse.data);
-                if (!isUpdate) {
-                    islandResultsSection.classList.remove('hidden');
-                }
-                
-                const creatorId = detailsResponse.data.creator?.id || detailsResponse.data.owner_code;
-                const secondaryDataPromises = await Promise.allSettled([
-                    fetchData(`/maps/${islandCode}/changelog`),
-                    fetchData(`/maps/${islandCode}/discovery`),
-                    creatorId ? fetchData(`/creators/${creatorId}/maps/more?map_id=${islandCode}&limit=4`) : Promise.reject('No creator ID')
-                ]);
-
-                if (secondaryDataPromises[0].status === 'fulfilled') displayMapChangelog(secondaryDataPromises[0].value.data);
-                else mapChangelogContainer.innerHTML = `<h2 class="text-2xl font-bold mb-4 text-[#ffc700]">Changelog</h2><p>Could not load changelog data.</p>`;
-
-                if (secondaryDataPromises[1].status === 'fulfilled') {
-                    displayDiscoveryHistory(secondaryDataPromises[1].value.data.results);
-                } else {
-                    mapDiscoveryHistoryContainer.innerHTML = `<h2 class="text-2xl font-bold mb-4 text-[#ffc700]">Discovery History</h2><p>Could not load discovery history.</p>`;
-                }
-                
-                if (secondaryDataPromises[2].status === 'fulfilled') displayMoreMaps(secondaryDataPromises[2].value.data, moreMapsContainer);
-                else moreMapsContainer.innerHTML = `<h2 class="text-2xl font-bold mb-4 text-[#ffc700]">More Maps</h2><p>Could not load more maps from this creator.</p>`;
-                
-                if (!isUpdate) {
-                    if (autoRefreshInterval) clearInterval(autoRefreshInterval);
-                    autoRefreshInterval = setInterval(() => searchIsland(islandCode, true), REFRESH_INTERVAL_MS);
-                }
-            } catch (error) {
-                if (!isUpdate) {
-                    showError(`Island with code "${islandCode}" not found. Please check the code and try again.`, 'islands');
-                } else {
-                    console.error(`Failed to auto-refresh island ${islandCode}:`, error);
-                }
-            } finally {
-                if (!isUpdate) {
-                    showLoading(false, 'islands');
-                }
-            }
-        }
-        
-        async function searchCreatorAPI(creatorCode, isUpdate = false) {
-             if (!isUpdate) {
-                showLoading(true, 'creators');
-             }
-             try {
-                const [profile, maps] = await Promise.all([
-                    fetchData(`/creators/${creatorCode}`),
-                    fetchData(`/creators/${creatorCode}/maps/all`),
-                ]);
-                displayCreatorProfile(profile.data);
-                displayCreatorMaps(maps.data);
-                if (!isUpdate) {
-                    creatorResultsSection.classList.remove('hidden');
-                }
-
-                if (!isUpdate) {
-                    if (autoRefreshInterval) clearInterval(autoRefreshInterval);
-                    autoRefreshInterval = setInterval(() => searchCreatorAPI(creatorCode, true), REFRESH_INTERVAL_MS);
-                }
-            } catch (error) {
-                if (!isUpdate) {
-                    showError(`Creator with code "${creatorCode}" not found. Please check the code and try again.`, 'creators');
-                } else {
-                    console.error(`Failed to auto-refresh creator ${creatorCode}:`, error);
-                }
-            } finally {
-                 if (!isUpdate) {
-                    showLoading(false, 'creators');
-                 }
-            }
-        }
-        
-        function handleUrlChange() {
-            if (autoRefreshInterval) {
-                clearInterval(autoRefreshInterval);
-                autoRefreshInterval = null;
-            }
-
-            const hash = location.hash.slice(1) || 'discovery';
-            const [path, query] = hash.split('?');
-            
-            // Switch tab visuals
-            tabButtons.forEach(button => button.classList.toggle('active', button.dataset.tab === path));
-            tabPanes.forEach(pane => pane.classList.toggle('active', pane.id === `${path}-content`));
-            
-            // Reset UI states
-            errorMessage.classList.add('hidden');
-            islandResultsSection.classList.add('hidden');
-            islandSearchContainer.classList.remove('hidden');
-            islandCodeInput.value = '';
-            creatorResultsSection.classList.add('hidden');
-            creatorSearchContainer.classList.remove('hidden');
-            creatorCodeInput.value = '';
-
-            if (query) {
-                const params = new URLSearchParams(query);
-                if (path === 'islands' && params.has('code')) {
-                    const code = params.get('code');
-                    islandCodeInput.value = code;
-                    searchIsland(code);
-                } else if (path === 'creators' && params.has('name')) {
-                    const name = params.get('name');
-                    creatorCodeInput.value = name;
-                    searchCreatorAPI(name);
-                }
-            }
-        }
-        
-        islandSearchForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const islandCode = islandCodeInput.value.trim();
-            if (islandCode) location.hash = `#islands?code=${islandCode}`;
-        });
-        
-        creatorSearchForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const creatorCode = creatorCodeInput.value.trim();
-            if (creatorCode) location.hash = `#creators?name=${creatorCode}`;
-        });
-
-        backToIslandSearchBtn.addEventListener('click', () => {
-            // Force reset to the search view for islands
-            location.hash = '#islands';
-            if(location.hash === '#islands') { // If hash doesn't change, manually trigger
-                handleUrlChange();
-            }
-        });
-        backToCreatorSearchBtn.addEventListener('click', () => {
-             // Force reset to the search view for creators
-            location.hash = '#creators';
-             if(location.hash === '#creators') { // If hash doesn't change, manually trigger
-                handleUrlChange();
-            }
-        });
-
-        tabButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                const newTab = e.currentTarget.dataset.tab;
-                const currentTab = location.hash.split('?')[0];
-                if (currentTab !== `#${newTab}`) {
-                    location.hash = `#${newTab}`;
-                }
-            });
-        });
-
-        function initializeApp() {
-            displayServerStatus();
-            setInterval(displayServerStatus, REFRESH_INTERVAL_MS);
-            
-            displayDiscoveryMaps();
-            setInterval(() => displayDiscoveryMaps(true), REFRESH_INTERVAL_MS);
-            
-            window.addEventListener('hashchange', handleUrlChange);
-            handleUrlChange(); // Handle initial load
-        }
-
-        initializeApp();
-    </script>
+(function(){
+showSt();setInterval(showSt,STATUS_REFRESH);
+showDisco();setInterval(()=>showDisco(true),DISCO_REFRESH);
+startAgoUpdater();
+hU()})();
+</script>
 </body>
 </html>
